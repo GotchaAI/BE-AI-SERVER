@@ -17,7 +17,7 @@ refine_net = load_refinenet_model(cuda=config.CUDA)
 print("REFINE_NET 가중치 로딩 완료.")
 
 
-def recog_image(image_bytes: bytes):
+def recog_text(image_bytes: bytes):
     """
     Args: bytes 이미지 데이터
     Returns: 이미지가 인식된 바운딩 박스
@@ -40,7 +40,7 @@ def recog_image(image_bytes: bytes):
 
 
 
-def mask_image(image_bytes: bytes, boxes):
+def mask_text(image_bytes: bytes, boxes):
     """
     Args: bytes 이미지 데이터, 바운딩 박스
     Returns: 마스킹 된 이미지 데이터터

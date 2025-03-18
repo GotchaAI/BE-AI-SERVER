@@ -1,6 +1,6 @@
 import config
 import numpy as np
-from text_masking import recog_image, mask_image
+from text_masking import recog_text, mask_text
 from PIL import Image
 
 def preproc(image_bytes: bytes, image_size=config.IMAGE_SIZE):
@@ -12,8 +12,8 @@ def preproc(image_bytes: bytes, image_size=config.IMAGE_SIZE):
     4. 정규화
     5. 차원 확장
     """
-    masking_box = recog_image(image_bytes=image_bytes)
-    masked_img = mask_image(image_bytes=image_bytes, boxes=masking_box) # PIL
+    masking_box = recog_text(image_bytes=image_bytes)
+    masked_img = mask_text(image_bytes=image_bytes, boxes=masking_box) # PIL
 
     img = masked_img.resize(image_size)
 
