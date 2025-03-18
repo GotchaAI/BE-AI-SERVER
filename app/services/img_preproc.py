@@ -1,7 +1,7 @@
 import config
 import numpy as np
-from text_masking import recog_text, mask_text
-from PIL import Image
+from app.services.text_masking import recog_text, mask_text
+import matplotlib.pyplot as plt
 
 def preproc(image_bytes: bytes, image_size=config.IMAGE_SIZE):
     """
@@ -14,9 +14,12 @@ def preproc(image_bytes: bytes, image_size=config.IMAGE_SIZE):
     """
     masking_box = recog_text(image_bytes=image_bytes)
     masked_img = mask_text(image_bytes=image_bytes, boxes=masking_box) # PIL
+    show_image(masked_img)
+
 
     img = masked_img.resize(image_size)
 
+    show_image(img)
     img_arr = np.array(img) / 255.0
     img_arr = np.expand_dims(img_arr, axis=-1)
     img_arr = np.expand_dims(img_arr, axis=0)
@@ -24,3 +27,13 @@ def preproc(image_bytes: bytes, image_size=config.IMAGE_SIZE):
     return img_arr
 
 
+
+def show_image(image):
+    """
+    Args:
+        image (PIL.Image): 출력할 이미지
+    """
+    plt.figure(figsize=(10, 6))
+    plt.imshow(image)
+    plt.axis("off")
+    plt.show()

@@ -4,4 +4,4 @@ from app.api.image_routes import router as image_router
 
 app = FastAPI()
 
-app.include_router(image_router)
+app.include_router(image_router, prefix='/api/v1')
