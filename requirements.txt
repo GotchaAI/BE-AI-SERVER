@@ -1,0 +1,12 @@
+fastapi==0.115.11
+keras==2.10.0
+matplotlib==3.10.1
+numpy==1.26.4
+openai==1.66.3
+opencv-python==4.5.4.60
+quickdraw==1.0.0
+scikit-learn==1.6.1
+tensorflow==2.10.1
+torch==1.11.0
+torchvision==0.12.0
+uvicorn==0.34.0
