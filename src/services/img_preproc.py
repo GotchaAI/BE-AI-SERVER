@@ -1,6 +1,6 @@
 import config
 import numpy as np
-from app.services.text_masking import recog_text, mask_text
+from src.services.text_masking import recog_text, mask_text
 import matplotlib.pyplot as plt
 
 def preproc(image_bytes: bytes, image_size=config.IMAGE_SIZE):

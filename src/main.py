@@ -1,6 +1,6 @@
 import uvicorn
 from fastapi import FastAPI
-from app.api.image_routes import router as image_router
+from src.api.image_routes import router as image_router
 
 app = FastAPI()
 

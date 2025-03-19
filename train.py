@@ -1,5 +1,3 @@
-# train_model.py
-
 import numpy as np
 from quickdraw import QuickDrawDataGroup
 import tensorflow as tf

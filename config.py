@@ -10,4 +10,4 @@ LONG_SIZE=1280
 MAX_DRAWINGS = 10000  # 각 클래스별 샘플 개수
 IMAGE_SIZE = (28, 28)  # 이미지 크기 (너비, 높이)
 CLASSES = ['cat', 'dog']
-MODEL_PATH='./train/model/cat_dog_model.h5'
+MODEL_PATH='./src/models/model/cat_dog_model.h5'

@@ -1,6 +1,6 @@
 import numpy as np
 import config
-from app.models import model
+from src.models import model
 
 def classify(image_bytes: bytes):
     pred = model.predict(image_bytes)
