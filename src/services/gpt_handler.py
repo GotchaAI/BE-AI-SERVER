@@ -1,14 +1,18 @@
 from openai import OpenAI
 import os
+import logging
+
 
 client = OpenAI(
     api_key = os.getenv('OPENAI_API_KEY')
 )
 
 
-def get_message(predicted_class, confidence):
+def get_message(result):
+    predicted_class = result['predicted_class']
+    confidence = result['confidence']
     prompt = f"{predicted_class} 확률 {confidence}"
-    print(f'프롬프트 전송 : {prompt}')
+    logging.info(f'프롬프트 전송 : {prompt}')
     completion = client.chat.completions.create(
         model="gpt-3.5-turbo",
         messages=[
@@ -20,6 +24,6 @@ def get_message(predicted_class, confidence):
             { "role" : "user", "content" : prompt}
         ]
     )
-    print('GPT 호출 완료')
+    logging.info('GPT 호출 완료')
     return completion.choices[0].message.content
 
