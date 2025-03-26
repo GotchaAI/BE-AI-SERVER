@@ -1,1 +1,1 @@
-# train CNN model
+# train CNN trained_model

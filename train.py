@@ -1,70 +1,46 @@
-import numpy as np
-from quickdraw import QuickDrawDataGroup
-import tensorflow as tf
-from tensorflow import keras
-from tensorflow.keras import layers
-from sklearn.model_selection import train_test_split
+from torch.utils.data import DataLoader
 import config
+import torch.utils.data
+from torchvision import transforms as T
+from train.trainer import train_model, test_model
+from datetime import datetime
+from src.models.model import CNNModel
+from train.datamodule import QuickDrawAllDataSet
 
-# ----------------------
-# QuickDraw 데이터 로드 (고양이, 개 각각 10000개)
-# ----------------------
-print("QuickDraw 데이터 로딩 중 ...")
-cat_data = QuickDrawDataGroup("cat", max_drawings=config.MAX_DRAWINGS)
-dog_data = QuickDrawDataGroup("dog", max_drawings=config.MAX_DRAWINGS)
-cat_drawings = cat_data.drawings
-dog_drawings = dog_data.drawings
-
-# ----------------------
-# NumPy 변환
-# ----------------------
-X_cat = [np.array(d.get_image(stroke_width=2).resize((config.IMAGE_SIZE[0], config.IMAGE_SIZE[1])).convert("L")) for d in cat_drawings]
-X_dog = [np.array(d.get_image(stroke_width=2).resize((config.IMAGE_SIZE[0], config.IMAGE_SIZE[1])).convert("L")) for d in dog_drawings]
-
-X_cat = np.array(X_cat)
-X_dog = np.array(X_dog)
-
-# 레이블 생성 (고양이=0, 개=1)
-y_cat = np.zeros(len(X_cat), dtype=np.int32)
-y_dog = np.ones(len(X_dog), dtype=np.int32)
-
-# 데이터 합치기
-X = np.concatenate([X_cat, X_dog], axis=0)
-y = np.concatenate([y_cat, y_dog], axis=0)
-
-# 스케일링 및 차원 확장 (CNN 입력용)
-X = X / 255.0
-X = np.expand_dims(X, axis=-1)  # (4000, 28, 28, 1)
-
-# ----------------------
-# 학습용/검증용 데이터 분할
-# ----------------------
-X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=0.2, random_state=42)
-
-# ----------------------
-# CNN 모델 정의
-# ----------------------
-model = keras.Sequential([
-    layers.Conv2D(32, (3,3), activation='relu', input_shape=(config.IMAGE_SIZE[0],config.IMAGE_SIZE[1],1)),
-    layers.MaxPooling2D((2,2)),
-    layers.Conv2D(64, (3,3), activation='relu'),
-    layers.MaxPooling2D((2,2)),
-    layers.Flatten(),
-    layers.Dense(64, activation='relu'),
-    layers.Dense(2, activation='softmax')  # 2개의 클래스 (cat/dog)
+encode_image = T.Compose([ # 이미지 데이터 전처리 : 32x32 크기, 정규화
+    T.Resize(32),
+    T.ToTensor(),
+    T.Normalize(0.5, 0.5)
 ])
 
-model.compile(optimizer='adam', loss='sparse_categorical_crossentropy', metrics=['accuracy'])
-model.summary()
+# Load CNN Model
+model = CNNModel(output_classes=len(config.CATEGORIES))
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+model.to(device)
 
-# ----------------------
-# 모델 학습
-# ----------------------
-print("모델 학습 시작...")
-history = model.fit(X_train, y_train, validation_data=(X_val, y_val), epochs=config.EPOCHS, batch_size=config.BATCH_SIZE)
 
-# ----------------------
-# 모델 저장
-# ----------------------
-model.save(config.MODEL_PATH)
-print("모델이 'cat_dog_model.h5' 파일로 저장되었습니다!")
+# Load Dataset
+dataset = QuickDrawAllDataSet(max_drawings=1000, transform = encode_image)
+
+# train, val split
+train_size = int(0.8 * len(dataset))
+val_size = len(dataset) - train_size
+train_dataset, val_dataset = torch.utils.data.random_split(dataset, [train_size, val_size])
+
+# init DataLoader
+train_loader = DataLoader(train_dataset, batch_size=32, shuffle=True)
+val_loader = DataLoader(val_dataset, batch_size=32, shuffle=False)
+
+
+# Train Model
+train_model(model, train_loader, val_loader)
+
+
+# Test Model
+test_loader = DataLoader(val_dataset, batch_size=32, shuffle=False)
+test_model(model, test_loader)
+
+# Save Model
+file_dir = config.MODEL_PATH + f"quickdraw_cnn_{datetime.now().strftime('%Y%m%d_%H%M%S')}.pth"
+torch.save(model.state_dict(), file_dir)
+print(f"모델 저장 완료: {file_dir}")

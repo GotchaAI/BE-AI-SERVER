@@ -9,20 +9,17 @@ async def predict(file: UploadFile = File(...)):
     contents = await file.read()
 
     # 이미지 전처리
-    img_arr = img_preproc.preproc(contents)
+    img = img_preproc.preproc(contents) # returns PIL
 
     # 분류기 예측
-    result = classifier.classify(img_arr)
+    result = classifier.classify(img)
 
     # GPT API 호출
-    message = gpt_handler.get_message(
-        predicted_class=result['predicted_class'], 
-        confidence=result['confidence']
-    )
+    for i in range(3):
+        result[i]['message'] = gpt_handler.get_message(result[i])
+
 
     return {
-        "filename": file.filename,
-        "predicted_class": result['predicted_class'],
-        "confidence": result['confidence'],
-        "message" : message
+        'filename': file.filename,
+        'result' : result
     }

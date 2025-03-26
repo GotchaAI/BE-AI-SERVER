@@ -1,31 +1,18 @@
-import config
-import numpy as np
+import io
+from PIL import Image
 from src.services.text_masking import recog_text, mask_text
 import matplotlib.pyplot as plt
 
-def preproc(image_bytes: bytes, image_size=config.IMAGE_SIZE):
+def preproc(image_bytes: bytes):
     """
     이미지 전처리 함수
-    1. text masking 수행
-    2. 흑백 변환
-    3. 크기 조정
-    4. 정규화
-    5. 차원 확장
+    1. PIL.Image로 변환
+    2. 텍스트 검출 후 masking
     """
-    masking_box = recog_text(image_bytes=image_bytes)
-    masked_img = mask_text(image_bytes=image_bytes, boxes=masking_box) # PIL
-    show_image(masked_img)
-
-
-    img = masked_img.resize(image_size)
-
-    show_image(img)
-    img_arr = np.array(img) / 255.0
-    img_arr = np.expand_dims(img_arr, axis=-1)
-    img_arr = np.expand_dims(img_arr, axis=0)
-
-    return img_arr
-
+    masking_box = recog_text(image_bytes)
+    image = Image.open(io.BytesIO(image_bytes)).convert('RGB')
+    masked_img = mask_text(image, masking_box) # PIL
+    return masked_img
 
 
 def show_image(image):

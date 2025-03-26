@@ -2,30 +2,29 @@ import io
 from PIL import Image, ImageDraw
 import config
 from craft_text_detector import (
-    read_image,
     load_craftnet_model,
     load_refinenet_model,
     get_prediction
 )
+import logging
 
-print("CRAFT_NET 가중치 로딩중 ...")
+logging.info("CRAFT_NET 가중치 로딩중 ...")
 craft_net = load_craftnet_model(cuda=config.CUDA)
-print("CRAFT_NET 가중치 로딩 완료.")
+logging.info("CRAFT_NET 가중치 로딩 완료.")
 
-print("REFINE_NET 가중치 로딩중...")
+logging.info("REFINE_NET 가중치 로딩중...")
 refine_net = load_refinenet_model(cuda=config.CUDA)
-print("REFINE_NET 가중치 로딩 완료.")
+logging.info("REFINE_NET 가중치 로딩 완료.")
 
 
-def recog_text(image_bytes: bytes):
+def recog_text(image: bytes):
     """
-    Args: bytes 이미지 데이터
+    Args: image
     Returns: 이미지가 인식된 바운딩 박스
     """
-    img_data = read_image(image_bytes)
-    print("텍스트 검출/마스킹 중...")
+    logging.info("텍스트 검출 중...")
     prediction_res = get_prediction(
-        image = img_data,
+        image = image,
         craft_net=craft_net,
         refine_net=refine_net,
         text_threshold=config.TEXT_THRESHOLD,
@@ -34,23 +33,23 @@ def recog_text(image_bytes: bytes):
         cuda=config.CUDA,
         long_size=config.LONG_SIZE
     )
-    print('텍스트 검출/마스킹 완료.')
-    # print(prediction_res['times'])
+    logging.info('텍스트 검출 완료.')
+    logging.info(f'텍스트 검출 걸린 시간: {sum(prediction_res["times"].values()):.2f}초.')
     return prediction_res['boxes']
 
 
 
-def mask_text(image_bytes: bytes, boxes):
+def mask_text(image: Image, boxes):
     """
-    Args: bytes 이미지 데이터, 바운딩 박스
-    Returns: 마스킹 된 이미지 데이터터
+    Args: PIL Image(RGB), 바운딩 박스
+    Returns: 마스킹 된 이미지 데이터
     """
-    img = Image.open(io.BytesIO(image_bytes)).convert('L')
-    draw = ImageDraw.Draw(img)
+    masked = image.copy()
+    draw = ImageDraw.Draw(masked)
     for box in boxes:
         box = [(int(point[0]), int(point[1])) for point in box]
-        draw.polygon(box, fill=255)
-    return img
+        draw.polygon(box, fill=(255, 255, 255))
+    return masked
 
 
 
