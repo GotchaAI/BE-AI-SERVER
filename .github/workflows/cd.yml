@@ -48,11 +48,11 @@ jobs:
           script: |
             cd ~/ai-server
             docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
-            docker pull ${{ secrets.DOCKER_USERNAME }}/ai-server:latest
+            docker pull ${{ secrets.DOCKER_USERNAME }}/gotcha-ai:latest
             docker stop ai-server || true
             docker rm ai-server || true
             docker run -d \
               --name ai-server \
               --env-file .env \
               -p 8000:8000 \
-              ${{ secrets.DOCKER_USERNAME }}/ai-server:latest
+              ${{ secrets.DOCKER_USERNAME }}/gotcha-ai:latest
