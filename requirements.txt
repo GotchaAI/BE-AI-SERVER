@@ -7,5 +7,5 @@ uvicorn
 python-multipart
 easyocr
 fastapi
-quickdraw
 openai
+transformers

@@ -24,3 +24,10 @@ async def predict(file: UploadFile = File(...)):
         'filename': file.filename,
         'result' : result
     }
+
+@router.post('/context')
+async def predict(file: UploadFile = File(...)):
+    contents = await file.read()
+
+    # 이미지 전처리
+    img = img_preproc.preproc(contents) # returns PIL
