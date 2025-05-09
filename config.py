@@ -1,9 +1,4 @@
-# CRAFT
 TEXT_THRESHOLD=0.7
-LINK_THRESHOLD=0.4
-LOW_TEXT=0.4
-CUDA=False
-LONG_SIZE=1280
 
 # QuickDraw 데이터 설정
 MAX_DRAWINGS = 10000  # 각 클래스별 샘플 개수
@@ -357,4 +352,4 @@ CATEGORIES = [
     ]
 
 
-MODEL_PATH= 'src/models/trained_model/'
+MODEL_PATH= 'src/image/trained_model/'

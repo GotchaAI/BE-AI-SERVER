@@ -4,7 +4,7 @@ import torch
 import torch.nn.functional as F
 import logging
 from torchvision import transforms as T
-from src.models.model import CNNModel
+from src.image.model import CNNModel
 import glob
 import os
 encode_image = T.Compose([
