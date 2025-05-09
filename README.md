@@ -21,18 +21,18 @@
 │   ├── main.py                # entry point (FastAPI 객체 생성)
 │   ├── api/                   # 라우팅 구성
 │   │   ├── __init__.py
-│   │   ├── image_route.py # 이미지 처리 관련 API 엔드포인트
-│   │   └── chat_route.py # GPT 호출 관련 API 엔드포인트
+│   │   ├── image_route.py     # 이미지 처리 관련 API 엔드포인트
+│   │   └── chat_route.py      # GPT 호출 관련 API 엔드포인트
 │   ├── chat/
 │   │   ├── __init__.py
 │   │   └── gpt_handler.py
 │   ├── image/         
 │   │   ├── __init__.py
 │   │   ├── trained_model/
-│   │   │   ├── model.pth # quickdraw 기반 분류 모델
-│   │   ├── classifier.py # quickdraw 기반 분류 기능
-│   │   ├── model.py # CNN 모델 정의
-│   │   ├── img_caption.py # BLIP 기반 captioning 기능 
-│   │   ├── preprocessor.py # 이미지 전처리
-│   │   └── text_masking.py # easyocr 기반 텍스트 마스킹 기능
+│   │   │   ├── model.pth      # quickdraw 기반 분류 모델
+│   │   ├── classifier.py      # quickdraw 기반 분류 기능
+│   │   ├── model.py           # CNN 모델 정의
+│   │   ├── img_caption.py     # BLIP 기반 captioning 기능 
+│   │   ├── preprocessor.py    # 이미지 전처리
+│   │   └── text_masking.py    # easyocr 기반 텍스트 마스킹 기능
 ```
