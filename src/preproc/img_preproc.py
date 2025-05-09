@@ -1,6 +1,6 @@
 import io
 from PIL import Image
-from src.services.text_masking import mask_text
+from src.services import mask_text
 
 def preproc(image_bytes: bytes):
     """

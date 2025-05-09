@@ -1,5 +1,6 @@
 from fastapi import APIRouter, File, UploadFile
-from src.services import img_preproc, gpt_handler
+from src.chat import gpt_handler
+from src.preproc import img_preproc
 from src.models import classifier
 
 router = APIRouter(prefix="/image")
