@@ -11,6 +11,10 @@ print('BLIP 모델 로딩완료!')
 
 
 def get_caption(image: Image) -> str:
-    
+    inputs = processor(images=image, return_tensors="pt")
 
+    with torch.no_grad():
+        output_ids = model.generate(**inputs)
+    caption = processor.decode(output_ids[0], skip_special_tokens=True)
 
+    return caption

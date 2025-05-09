@@ -1,32 +1,33 @@
 from fastapi import APIRouter, File, UploadFile
 from src.chat import gpt_handler
-from src.image import classifier, preprocessing
+from src.image import classifier, preprocessor, img_caption
 
 router = APIRouter(prefix="/image")
 
-@router.post("/predict")
+@router.post("/classify")
 async def predict(file: UploadFile = File(...)):
     contents = await file.read()
 
     # 이미지 전처리
-    img = img_preproc.preproc(contents) # returns PIL
+    img = preprocessor.preproc(contents) # returns PIL
 
     # 분류기 예측
     result = classifier.classify(img)
 
-    # GPT API 호출
-    for i in range(3):
-        result[i]['message'] = gpt_handler.get_message(result[i])
-
-
     return {
-        'filename': file.filename,
         'result' : result
     }
 
-@router.post('/context')
+@router.post('/caption')
 async def predict(file: UploadFile = File(...)):
     contents = await file.read()
 
     # 이미지 전처리
-    img = img_preproc.preproc(contents) # returns PIL
+    img = preprocessor.preproc(contents) # returns PIL
+
+    # 문장으로 변환
+    caption = img_caption.get_caption(img)
+
+    return {
+        'caption': caption
+    }
