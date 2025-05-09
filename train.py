@@ -4,7 +4,7 @@ import torch.utils.data
 from torchvision import transforms as T
 from train.trainer import train_model, test_model
 from datetime import datetime
-from src.models.model import CNNModel
+from src.models import CNNModel
 from train.datamodule import QuickDrawAllDataSet
 
 encode_image = T.Compose([ # 이미지 데이터 전처리 : 32x32 크기, 정규화
