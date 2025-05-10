@@ -1,3 +1,5 @@
+from typing import Dict, Any, List
+
 from fastapi import APIRouter, File, UploadFile
 from fastapi.responses import JSONResponse
 from src.image import classifier, preprocessor, img_caption
@@ -8,7 +10,9 @@ router = APIRouter(prefix="/image")
 
 class ClassifyRes(BaseModel):
     filename: str = Field(description="Image filename")
-    result: str = Field(description="Image result")
+    result: List[Dict[str, Any]] = Field(description="Classifying result")
+
+
 
 @router.post(
     "/classify",
@@ -20,10 +24,20 @@ class ClassifyRes(BaseModel):
         "description" : "성공",
         "content" :{
             "application/json" : {
-                "example": {
-                    "filename" : "cat.png",
-                    "result" :"cat"
-                }
+                "example": [
+                    {
+                        "predicted_class": "rain",
+                        "confidence": 32.96
+                    },
+                    {
+                        "predicted_class": "garden",
+                        "confidence": 21.20
+                    },
+                    {
+                        "predicted_class": "matches",
+                        "confidence": 16.13
+                    }
+                ]
             }
         }
     }
