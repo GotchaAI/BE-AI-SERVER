@@ -1,33 +1,50 @@
+from typing import Dict, Any, List
+
 from fastapi import APIRouter, File, UploadFile
 from fastapi.responses import JSONResponse
 from src.image import classifier, preprocessor, img_caption
 from pydantic import BaseModel, Field
 
-router = APIRouter(prefix="/image")
+router = APIRouter(prefix="/image", tags=['Image'])
 
 
 class ClassifyRes(BaseModel):
     filename: str = Field(description="Image filename")
-    result: str = Field(description="Image result")
+    result: List[Dict[str, Any]] = Field(description="Classifying result")
 
-@router.post(
+
+
+@router.get(
     "/classify",
     summary="이미지 분류 API",
     description="이미지 파일을 받아 QuickDraw 345개 클래스를 기반으로 분류합니다.",
     response_model=ClassifyRes,
     responses={
     200: {
-        "description" : "성공",
-        "content" :{
-            "application/json" : {
-                "example": {
-                    "filename" : "cat.png",
-                    "result" :"cat"
+            "description" : "성공",
+            "content" :{
+                "application/json" : {
+                    "example": {
+                        "filename": "cat_ko.png",
+                        "result": [
+                            {
+                                "predicted_class": "rain",
+                                "confidence": 32.96
+                            },
+                            {
+                                "predicted_class": "garden",
+                                "confidence": 21.20
+                            },
+                            {
+                                "predicted_class": "matches",
+                                "confidence": 16.13
+                            }
+                        ]
+                    }
                 }
             }
         }
     }
-}
 )
 async def classify(file: UploadFile = File(..., description="이미지 파일")):
     contents = await file.read()
@@ -45,7 +62,8 @@ async def classify(file: UploadFile = File(..., description="이미지 파일"))
 class CaptioningRes(BaseModel):
     filename: str = Field(description="Image filename")
     result: str = Field(description="Image result")
-@router.post(
+
+@router.get(
     '/caption',
     summary="이미지 문장 추출 API",
     description="이미지 파일을 받아 해당 이미지를 묘사하는 적절한 문장을 반환합니다.",
