@@ -109,7 +109,7 @@ class MyoMyoAI:
             })
 
         try:
-            responses = await self.client.chat.completions.create(
+            responses = self.client.chat.completions.create(
                 model = self.model,
                 messages = messages,
                 temperature = 0.8, # 모델 출력의 무작위성 제어
