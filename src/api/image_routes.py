@@ -45,6 +45,7 @@ async def classify(file: UploadFile = File(..., description="이미지 파일"))
 class CaptioningRes(BaseModel):
     filename: str = Field(description="Image filename")
     result: str = Field(description="Image result")
+
 @router.post(
     '/caption',
     summary="이미지 문장 추출 API",
