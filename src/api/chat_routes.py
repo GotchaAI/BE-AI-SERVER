@@ -15,15 +15,12 @@ myomyo = MyoMyoAI(api_key=OPENAI_API_KEY)
 class GameStartReq(BaseModel):
     players: List[str] = Field(..., description="게임에 참여할 플레이어 이름 List")
 
-class GameStartRes(BaseModel):
-    game_id: str
-    message: str
 
-@router.get(
+
+@router.post(
     "/{game_id}/start",
     summary="게임 시작 메시지 API",
     description="게임 시작에 따른 묘묘의 도발 메시지를 반환합니다.",
-    response_model=GameStartRes,
     responses={
         200:{
             "description": "성공",
@@ -40,23 +37,18 @@ class GameStartRes(BaseModel):
 )
 async def start_game(game_id: str, request: GameStartReq = Body(..., example= { "players": [ "창모", "릴러말즈" ]})):
     message = await myomyo.game_start_message(game_id=game_id, players=request.players)
-    return GameStartRes(game_id=game_id, message=message)
+    return message
 
 # START_ROUND
 class RoundStartReq(BaseModel):
-    drawing_player: str = Field(..., description="해당 라운드에 그림을 그릴 플레이어 이름")
-    round_num: int = Field(..., description="현재 라운드(1~3)")
-    total_rounds: int = Field(..., description="총 라운드 수(3)")
+    roundNum: int = Field(..., description="현재 라운드(1~3)")
+    totalRounds: int = Field(..., description="총 라운드 수(3)")
 
-class RoundStartRes(BaseModel):
-    game_id: str
-    message: str
 
-@router.get(
+@router.post(
     path="/{game_id}/round/start",
     summary="라운드 시작 메시지 API",
     description="라운드 시작에 따른 묘묘의 도발 메시지를 반환합니다.",
-    response_model=RoundStartRes,
     responses={
         200: {
             "description": "성공",
@@ -64,7 +56,7 @@ class RoundStartRes(BaseModel):
                 "application/json": {
                     "example": {
                         "game_id": "1",
-                        "message": "허허, 창모야! 그림 실력으로 나를 이길 자신 있나? 자, 이번에는 내가 예리한 눈썰미로 정답 맞출 차례니까, 신나게 그려봐! 😉🎨✨"
+                        "message": "자, 이번에는 내가 예리한 눈썰미로 정답 맞출 차례니까, 신나게 그려봐! 😉🎨✨"
                     }
                 }
             }
@@ -72,17 +64,15 @@ class RoundStartRes(BaseModel):
     }
 )
 async def start_round(game_id: str, request: RoundStartReq = Body(..., example={
-    "drawing_player" : "창모",
-    "round_num" : 1,
-    "total_rounds" : 3
+    "roundNum" : 1,
+    "totalRounds" : 3
 })):
     message = await myomyo.round_start_message(
         game_id=game_id,
-        drawing_player=request.drawing_player,
-        round_num=request.round_num,
-        total_rounds=request.total_rounds
+        round_num=request.roundNum,
+        total_rounds=request.totalRounds
     )
-    return RoundStartRes(game_id=game_id, message=message)
+    return message
 
 # MAKE_GUESS
 class MakeGuessReq(BaseModel):
@@ -92,7 +82,7 @@ class MakeGuessRes(BaseModel):
     game_id: str
     message: str
 
-@router.get(
+@router.post(
     "/{game_id}/guess",
     summary="AI 정답 추론 API",
     description="그림에 대한 설명을 받아 해당 그림이 나타내는 정답을 추론하여 메시지로 반환합니다.",
@@ -131,7 +121,7 @@ class GuessReactRes(BaseModel):
     game_id: str
     message: str
 
-@router.get(
+@router.post(
     "/{game_id}/guess/react",
     summary="예측 결과 반응 메시지 API",
     response_model=GuessReactRes,
@@ -172,7 +162,7 @@ class EndGameRes(BaseModel):
     game_id: str
     message: str
 
-@router.get(
+@router.post(
     path="/{game_id}/end",
     summary="게임 종료 메시지 API",
     description="게임 종료 로직 처리 및 결과에 대한 묘묘의 반응을 반환합니다.",

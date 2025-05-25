@@ -139,7 +139,7 @@ class MyoMyoAI:
         게임 시작을 알리는 도발적이고 재미있는 인사를 해줘."""
         return await self.generate_response(game_id=game_id, role="system", prompt=prompt)
 
-    async def round_start_message(self, game_id: str, drawing_player: str, round_num: int, total_rounds: int) -> str:
+    async def round_start_message(self, game_id: str, round_num: int, total_rounds: int) -> str:
         """
         라운드 시작 시 묘묘의 도발 메시지
         Args:
@@ -148,8 +148,7 @@ class MyoMyoAI:
             round_num: 현재 라운드 번호
             total_rounds: 전체 라운드
         """
-        prompt = f"""이제 {round_num}/{total_rounds} 라운드가 시작되었어.
-                이번에는 '{drawing_player}'가 그림을 그릴 차례야.
+        prompt = f"""이제 {total_rounds} 개의 라운드 중에 {round_num}번째 라운드가 시작되었어.
                 라운드 시작을 알리는 짧고 도발적인 멘트를 해줘."""
         return await self.generate_response(game_id=game_id, role="system", prompt=prompt)
 
