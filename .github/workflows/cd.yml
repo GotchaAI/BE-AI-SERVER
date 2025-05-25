@@ -47,10 +47,15 @@ jobs:
           key: ${{ secrets.SERVER_PRIVATE_KEY }}
           script: |
             cd ~/ai-server
-            docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
-            docker pull ${{ secrets.DOCKER_USERNAME }}/gotcha-ai:latest
+          
             docker stop ai-server || true
             docker rm ai-server || true
+            
+            docker system prune -a -f || true
+            
+            docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
+            docker pull ${{ secrets.DOCKER_USERNAME }}/gotcha-ai:latest
+            
             docker run -d \
               --name ai-server \
               --env-file .env \
