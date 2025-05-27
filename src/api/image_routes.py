@@ -1,10 +1,10 @@
 from typing import Dict, Any, List
 
-from fastapi import APIRouter, File, UploadFile
-from fastapi.responses import JSONResponse
+from fastapi import APIRouter, File, UploadFile, Body, HTTPException
 from src.image import classifier, preprocessor, img_caption
 from pydantic import BaseModel, Field
-
+import requests
+from io import BytesIO
 router = APIRouter(prefix="/image", tags=['Image'])
 
 
@@ -12,51 +12,31 @@ class ClassifyRes(BaseModel):
     filename: str = Field(description="Image filename")
     result: List[Dict[str, Any]] = Field(description="Classifying result")
 
-
+class ClassifyReq(BaseModel):
+    imageURL: str = Field(description = "Image URL")
 
 @router.get(
     "/classify",
     summary="이미지 분류 API",
-    description="이미지 파일을 받아 QuickDraw 345개 클래스를 기반으로 분류합니다.",
+    description="S3 이미지 URL을 받아 QuickDraw 345개 클래스를 기반으로 분류합니다.",
     response_model=ClassifyRes,
-    responses={
-    200: {
-            "description" : "성공",
-            "content" :{
-                "application/json" : {
-                    "example": {
-                        "filename": "cat_ko.png",
-                        "result": [
-                            {
-                                "predicted_class": "rain",
-                                "confidence": 32.96
-                            },
-                            {
-                                "predicted_class": "garden",
-                                "confidence": 21.20
-                            },
-                            {
-                                "predicted_class": "matches",
-                                "confidence": 16.13
-                            }
-                        ]
-                    }
-                }
-            }
-        }
-    }
 )
-async def classify(file: UploadFile = File(..., description="이미지 파일")):
-    contents = await file.read()
+async def classify(request: ClassifyReq = Body(...)):
+    try:
+        response = requests.get(request.imageURL)
+        response.raise_for_status()  # HTTPError 발생시 예외 처리
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Image processing error: {str(e)}")
 
-    # 이미지 전처리
-    img = preprocessor.preproc(contents) # returns PIL
+    try:
+        bytes_img = response.content
+        img = preprocessor.preproc(bytes_img)
+        result = classifier.classify(img)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Classification error: {str(e)}")
 
-    # 분류기 예측
-    result = classifier.classify(img)
-
-    return ClassifyRes(filename=file.filename, result=result)
-
+    filename = request.imageURL.split("/")[-1]
+    return ClassifyRes(filename=filename, result=result)
 
 
 class CaptioningRes(BaseModel):
