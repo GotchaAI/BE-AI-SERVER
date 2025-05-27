@@ -153,6 +153,15 @@ class MyoMyoAI:
         return await self.generate_response(game_id=game_id, role="system", prompt=prompt)
 
 
+    async def guess_start_message(self, game_id, round_num, total_rounds, drawer, guesser):
+        """
+        drawer가 그린 그림에 대해서 추측을 시작할 차례.
+        """
+        prompt = f"""지금 {total_rounds} 개의 라운드 중에 {round_num}번째 라운드야. 
+        이제 {'너' if guesser == 'AI' else guesser}가 그림을 맞출 차례야. {drawer}가 그린 그림이 뭔지를 어떻게 맞출지 {'포부를 보여줄래? ' if guesser == "AI" else '도발을 한 번 해볼래?'}"""
+        return await self.generate_response(game_id = game_id, role="system", prompt = prompt)
+
+
     async def guess_message(self, game_id: str, image_description: str) -> str:
 
         """
