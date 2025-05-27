@@ -74,9 +74,26 @@ async def start_round(game_id: str, request: RoundStartReq = Body(..., example={
     )
     return message
 
+
+
+class GuessStartReq(BaseModel):
+    roundNum: int
+    totalRounds: int
+    drawer: str
+    guesser: str
+
+
+@router.post(
+    path = '/{game_id}/round/guess/start/',
+    summary = "추측 시작 시 묘묘의 도발 메시지"
+)
+async def guess_start(game_id: str, request: GuessStartReq = Body(...,)):
+    message = await myomyo.guess_start_message(game_id=game_id, round_num=request.roundNum, total_rounds=request.totalRounds, drawer=request.drawer, guesser = request.guesser)
+    return message
+
 # MAKE_GUESS
 class MakeGuessReq(BaseModel):
-    image_description: str = Field(..., description="그림에 대한 설명")
+    imageDescription: str = Field(..., description="그림에 대한 설명")
 
 class MakeGuessRes(BaseModel):
     game_id: str
@@ -106,14 +123,14 @@ async def make_guess(game_id: str, request: MakeGuessReq = Body(..., example={
 })):
     message = await myomyo.guess_message(
         game_id=game_id,
-        image_description=request.image_description
+        image_description=request.imageDescription
     )
     return MakeGuessRes(game_id=game_id, message=message)
 
 
 # GUESS_REACT
 class GuessReactReq(BaseModel):
-    is_correct: bool = Field(..., description="추측의 정답 여부")
+    is_correct: bool = Field(..., alias="isCorrect", description="추측의 정답 여부")
     answer: str = Field(..., description="실제 정답")
     guesser: str = Field(default=None, description="추측한 플레이어")
 
