@@ -209,6 +209,17 @@ class MyoMyoAI:
 
         return await self.generate_response(game_id=game_id, role="system", prompt=prompt)
 
+
+    async def round_end_message(self, game_id: str, round_num: int, total_rounds: int, is_myomyo_win: bool) -> str:
+        """
+        라운드 종료에 대한 묘묘의 반응
+
+        """
+        prompt = f"""{total_rounds} 개의 라운드 중에 {round_num} 번째 라운드가 종료되었어. 너는 {'이겼어' if is_myomyo_win else '졌어'}. 게임 결과에 대한 너의 생각을 도발적이고 재미있게 말해줘."""
+        return await self.generate_response(game_id = game_id, role="system", prompt = prompt)
+
+
+
     async def game_end_message(self, game_id: str, is_myomyo_win: bool) -> str:
         """
         게임 종료에 대한 묘묘의 반응

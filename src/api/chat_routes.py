@@ -76,6 +76,30 @@ async def start_round(game_id: str, request: RoundStartReq = Body(..., example={
 
 
 
+class RoundEndReq(BaseModel):
+    roundNum: int
+    totalRounds: int
+    winner: str
+
+@router.post(
+    path="/{game_id}/round/end",
+    summary = "라운드 종료 메시지 API",
+    description="라운드 종료 및 결과에 따른 묘묘의 반응 메시지를 반환합니다."
+)
+async def round_end(game_id: str, request: RoundEndReq = Body):
+    message = await myomyo.round_end_message(
+        game_id = game_id,
+        round_num = request.roundNum,
+        total_rounds = request.totalRounds,
+        is_myomyo_win= (request.winner == "AI")
+    )
+    return message
+
+
+
+
+
+
 class GuessStartReq(BaseModel):
     roundNum: int
     totalRounds: int
@@ -84,7 +108,7 @@ class GuessStartReq(BaseModel):
 
 
 @router.post(
-    path = '/{game_id}/round/guess/start/',
+    path = '/{game_id}/guess/start/',
     summary = "추측 시작 시 묘묘의 도발 메시지"
 )
 async def guess_start(game_id: str, request: GuessStartReq = Body(...,)):
@@ -173,17 +197,13 @@ async def guess_react(game_id: str, request: GuessReactReq = Body(..., example={
 
 # END_GAME
 class EndGameReq(BaseModel):
-    is_myomyo_win: bool = Field(..., description="묘묘의 승리 여부")
+    winner: str = Field(..., description="묘묘의 승리 여부")
 
-class EndGameRes(BaseModel):
-    game_id: str
-    message: str
 
 @router.post(
     path="/{game_id}/end",
     summary="게임 종료 메시지 API",
     description="게임 종료 로직 처리 및 결과에 대한 묘묘의 반응을 반환합니다.",
-    response_model=EndGameRes,
     responses={
         200: {
             "description" : "성공",
@@ -197,12 +217,10 @@ class EndGameRes(BaseModel):
             }
         }
     })
-async def end_game(game_id: str, request: EndGameReq = Body(..., example={
-    "is_myomyo_win" : False
-})):
+async def end_game(game_id: str, request: EndGameReq = Body(...,)):
     message = await myomyo.game_end_message(
         game_id=game_id,
-        is_myomyo_win=request.is_myomyo_win
+        is_myomyo_win=request.winner == "AI"
     )
     myomyo.cleanup_game(game_id=game_id)
-    return EndGameRes(game_id=game_id, message=message)
+    return message

@@ -8,14 +8,18 @@ from io import BytesIO
 router = APIRouter(prefix="/image", tags=['Image'])
 
 
+class AiPrediction(BaseModel):
+    predicted: str
+    confidence: float
+
 class ClassifyRes(BaseModel):
     filename: str = Field(description="Image filename")
-    result: List[Dict[str, Any]] = Field(description="Classifying result")
+    result: List[AiPrediction] = Field(description="Classifying result")
 
 class ClassifyReq(BaseModel):
     imageURL: str = Field(description = "Image URL")
 
-@router.get(
+@router.post(
     "/classify",
     summary="이미지 분류 API",
     description="S3 이미지 URL을 받아 QuickDraw 345개 클래스를 기반으로 분류합니다.",
@@ -31,9 +35,19 @@ async def classify(request: ClassifyReq = Body(...)):
     try:
         bytes_img = response.content
         img = preprocessor.preproc(bytes_img)
-        result = classifier.classify(img)
+        result_raw = classifier.classify(img)
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Classification error: {str(e)}")
+
+    # result_raw: List[Dict] 형태
+    result = []
+
+    # (num, predicted) 튜플로 넘어오던 classifying 결과
+    for r in result_raw:
+        label = r["predicted"]
+        if isinstance(label, tuple):
+            label = label[1]  # (score, label) → label만 추출
+        result.append(AiPrediction(predicted=label, confidence=r["confidence"]))
 
     filename = request.imageURL.split("/")[-1]
     return ClassifyRes(filename=filename, result=result)
@@ -43,7 +57,7 @@ class CaptioningRes(BaseModel):
     filename: str = Field(description="Image filename")
     result: str = Field(description="Image result")
 
-@router.get(
+@router.post(
     '/caption',
     summary="이미지 문장 추출 API",
     description="이미지 파일을 받아 해당 이미지를 묘사하는 적절한 문장을 반환합니다.",

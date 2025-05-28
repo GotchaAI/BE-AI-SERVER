@@ -100,7 +100,7 @@ def classify(image):
             confidence = top3_prob[0][i].item() * 100
             
             results.append({
-                'predicted_class': config.CATEGORIES[class_idx],
+                'predicted': config.CATEGORIES[class_idx],
                 'confidence': confidence
             })
         
@@ -110,7 +110,7 @@ def classify(image):
         logging.error(f"분류 중 오류 발생: {e}")
         # 오류 발생 시 기본값 반환
         return [
-            {'predicted_class': 'unknown', 'confidence': 0.0},
-            {'predicted_class': 'unknown', 'confidence': 0.0},
-            {'predicted_class': 'unknown', 'confidence': 0.0}
+            {'predicted': 'unknown', 'confidence': 0.0},
+            {'predicted': 'unknown', 'confidence': 0.0},
+            {'predicted': 'unknown', 'confidence': 0.0}
         ]
