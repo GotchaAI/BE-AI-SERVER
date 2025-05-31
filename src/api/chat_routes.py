@@ -107,6 +107,7 @@ class GuessStartReq(BaseModel):
     guesser: str
 
 
+# GUESS_START
 @router.post(
     path = '/{game_id}/guess/start/',
     summary = "추측 시작 시 묘묘의 도발 메시지"
@@ -119,15 +120,12 @@ async def guess_start(game_id: str, request: GuessStartReq = Body(...,)):
 class MakeGuessReq(BaseModel):
     imageDescription: str = Field(..., description="그림에 대한 설명")
 
-class MakeGuessRes(BaseModel):
-    game_id: str
-    message: str
 
+# GUESS_SUBMIT
 @router.post(
     "/{game_id}/guess",
     summary="AI 정답 추론 API",
     description="그림에 대한 설명을 받아 해당 그림이 나타내는 정답을 추론하여 메시지로 반환합니다.",
-    response_model=MakeGuessRes,
     responses={
         200: {
             "description": "성공",
@@ -149,7 +147,7 @@ async def make_guess(game_id: str, request: MakeGuessReq = Body(..., example={
         game_id=game_id,
         image_description=request.imageDescription
     )
-    return MakeGuessRes(game_id=game_id, message=message)
+    return message
 
 
 # GUESS_REACT
@@ -158,14 +156,10 @@ class GuessReactReq(BaseModel):
     answer: str = Field(..., description="실제 정답")
     guesser: str = Field(default=None, description="추측한 플레이어")
 
-class GuessReactRes(BaseModel):
-    game_id: str
-    message: str
-
+# GUESS_RESULT
 @router.post(
     "/{game_id}/guess/react",
     summary="예측 결과 반응 메시지 API",
-    response_model=GuessReactRes,
     description="예측 결과에 대한 묘묘의 반응",
     responses={
         200: {
@@ -193,13 +187,14 @@ async def guess_react(game_id: str, request: GuessReactReq = Body(..., example={
         answer=request.answer
     )
 
-    return GuessReactRes(game_id=game_id, message=message)
+    return message
 
-# END_GAME
+
+
 class EndGameReq(BaseModel):
     winner: str = Field(..., description="묘묘의 승리 여부")
 
-
+# GAME_END
 @router.post(
     path="/{game_id}/end",
     summary="게임 종료 메시지 API",
