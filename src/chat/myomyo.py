@@ -17,7 +17,7 @@ class MyoMyoAI:
                 cls._instance._initialized = False
         return cls._instance
 
-    def __init__(self, api_key: str, model: str = "gpt-4"):
+    def __init__(self, api_key: str, model: str = "gpt-3.5-turbo"):
         """
         묘묘 AI 초기화 (한 번만 실행됨)
 
