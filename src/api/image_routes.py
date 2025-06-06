@@ -35,19 +35,10 @@ async def classify(request: ClassifyReq = Body(...)):
     try:
         bytes_img = response.content
         img = preprocessor.preproc(bytes_img)
-        result_raw = classifier.classify(img)
+        result = classifier.classify(img)
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Classification error: {str(e)}")
 
-    # result_raw: List[Dict] 형태
-    result = []
-
-    # (num, predicted) 튜플로 넘어오던 classifying 결과
-    for r in result_raw:
-        label = r["predicted"]
-        if isinstance(label, tuple):
-            label = label[1]  # (score, label) → label만 추출
-        result.append(AiPrediction(predicted=label, confidence=r["confidence"]))
 
     filename = request.imageURL.split("/")[-1]
     return ClassifyRes(filename=filename, result=result)

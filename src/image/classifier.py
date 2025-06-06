@@ -100,7 +100,7 @@ def classify(image):
             confidence = top3_prob[0][i].item() * 100
             
             results.append({
-                'predicted': config.CATEGORIES[class_idx],
+                'predicted': config.KOR_CATEGORIES[class_idx],
                 'confidence': confidence
             })
         
