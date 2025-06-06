@@ -63,7 +63,7 @@ def load_efficientnet_model(model_path, num_classes):
         return model
 
 # 모델 로드
-model = load_efficientnet_model(latest_file, len(config.CATEGORIES))
+model = load_efficientnet_model(latest_file, len(config.KOR_CATEGORIES))
 model.to(device)
 model.eval()  # 평가 모드
 logging.info("EfficientNet 모델 로드 완료!")
