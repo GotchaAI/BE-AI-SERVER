@@ -21,11 +21,13 @@
 │   ├── main.py                # entry point (FastAPI 객체 생성)
 │   ├── api/                   # 라우팅 구성
 │   │   ├── __init__.py
-│   │   ├── image_route.py     # 이미지 처리 관련 API 엔드포인트
-│   │   └── chat_route.py      # GPT 호출 관련 API 엔드포인트
+│   │   ├── image_routes.py    # 이미지 처리 관련 API 엔드포인트
+│   │   ├── myomyo_routes.py   # MYOMYO 메시지 관련 API 엔드포인트
+│   │   └── lulu_routes.py     # LULU 메시지 관련 API 엔드포인트
 │   ├── chat/
 │   │   ├── __init__.py
-│   │   └── gpt_handler.py
+│   │   ├── myomyo.py          # 묘묘 프롬프트 및 게임 흐름 관리
+│   │   └── lulu.py            # 루루 프롬프트 및 게임 흐름 관리
 │   ├── image/         
 │   │   ├── __init__.py
 │   │   ├── trained_model/
