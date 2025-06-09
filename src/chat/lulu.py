@@ -2,7 +2,7 @@ from openai import OpenAI
 from threading import Lock
 from typing import Dict, List
 import json
-import uuid
+import random
 
 
 class LuLuAI:
@@ -16,7 +16,7 @@ class LuLuAI:
                 cls._instance._initialized = False
         return cls._instance
 
-    def __init__(self, api_key: str, model: str = "gpt-4"):
+    def __init__(self, api_key: str, model: str = "gpt-4.1"):
         """
         LuLu AI 초기화 (한 번만 실행됨)
 
@@ -34,12 +34,17 @@ class LuLuAI:
 
     def create_game(self) -> str:
         """
-        새 게임 시작 및 gameId 발급
+        새 게임 시작 및 4자리 gameId 발급
 
         Returns:
-            str: 생성된 gameId
+            str: 생성된 4자리 gameId
         """
-        game_id = str(uuid.uuid4())
+        # 중복되지 않는 4자리 숫자 생성
+        while True:
+            game_id = f"{random.randint(1000, 9999)}"
+            if game_id not in self.game_contexts:
+                break
+
         self.game_contexts[game_id] = {
             "tasks": [],  # 생성된 과제들
             "evaluations": [],  # 평가 결과들
@@ -49,13 +54,13 @@ class LuLuAI:
 
     def generate_drawing_task(self, game_id: str) -> Dict:
         """
-        요청 단계: AI가 키워드와 상황을 생성하여 그림 과제 제시
+        요청 단계: AI가 추상적이고 시적인 표현으로 그림 과제 제시
 
         Args:
             game_id: 게임 ID
 
         Returns:
-            Dict: {"keyword": str, "situation": str, "game_id": str}
+            Dict: {"hidden_keyword": str, "poetic_description": str, "game_id": str}
         """
         if game_id not in self.game_contexts:
             raise ValueError("Invalid game ID")
@@ -64,19 +69,23 @@ class LuLuAI:
 
         # 이전 과제들을 참고하여 중복 방지
         previous_tasks = context["tasks"]
-        previous_keywords = [task["keyword"] for task in previous_tasks]
+        previous_keywords = [task["hidden_keyword"] for task in previous_tasks]
 
         system_prompt = f"""
-        너는 창의적인 AI 게임 마스터야. 사용자에게 그림을 그리도록 요청할 키워드와 상황을 제시해줘.
+        너는 꿈과 환상을 다루는 신비로운 이야기꾼이야. 
+        사용자에게 그림을 그리게 하고 싶은데, 직접적으로 말하지 말고 매우 추상적이고 시적으로 표현해줘.
 
-        요구사항:
-        - 명사(키워드) + 구체적인 상황으로 구성
-        - 그리기에 적절한 중간 수준의 난이도
+        규칙:
+        - 핵심 키워드(명사)를 정하되, 절대 그 단어를 직접 언급하지 마
+        - 감정적이고 모호한 표현 사용
+        - 마치 꿈에서 본 장면을 애매하게 묘사하는 느낌
+        - "어둠이 숨을 죽이고 있을 때..." 같은 스타일
+        - 해석의 여지가 많도록 추상적으로
 
         {"이전에 사용한 키워드들: " + ", ".join(previous_keywords) + " (이 키워드들은 피해줘)" if previous_keywords else ""}
 
-        출력은 반드시 JSON 형식으로 해줘:
-        {{"keyword": "명사", "situation": "구체적인 상황 설명"}}
+        출력은 반드시 JSON 형식으로:
+        {{"hidden_keyword": "숨겨진 키워드", "poetic_description": "시적이고 추상적인 묘사"}}
         """
 
         try:
@@ -84,10 +93,10 @@ class LuLuAI:
                 model=self.model,
                 messages=[
                     {"role": "system", "content": system_prompt},
-                    {"role": "user", "content": "새로운 그림 주제를 생성해줘."}
+                    {"role": "user", "content": "새로운 그림 주제를 시적으로 표현해줘."}
                 ],
-                temperature=0.8,
-                max_tokens=200
+                temperature=0.9,
+                max_tokens=250
             )
 
             # JSON 파싱
@@ -104,8 +113,8 @@ class LuLuAI:
             print(f"Error generating task: {e}")
             # 기본값 반환
             fallback_task = {
-                "keyword": "고양이",
-                "situation": "고양이가 나무 위에서 자고 있는 모습",
+                "hidden_keyword": "달",
+                "poetic_description": "밤이 깊어질 때, 하늘의 은밀한 친구가 창문 너머로 속삭이고 있어. 그 둥근 미소가 어둠 속에서 혼자 빛나고 있는데, 왜인지 모르게 마음이 차분해져. 그 장면, 나한테 다시 보여줄 수 있을까?",
                 "game_id": game_id
             }
             context["tasks"].append(fallback_task)
@@ -113,14 +122,14 @@ class LuLuAI:
 
     def evaluate_drawing(self, game_id: str, drawing_description: str) -> Dict:
         """
-        평가 단계: AI가 사용자의 그림을 의도한 그림과 비교하여 평가
+        평가 단계: AI가 사용자의 그림을 숨겨진 키워드와 비교하여 평가
 
         Args:
             game_id: 게임 ID
             drawing_description: 사용자가 그린 그림의 텍스트 설명
 
         Returns:
-            Dict: {"score": int, "feedback": str, "keyword_match": int, "situation_match": int, "creativity": int, "task": Dict}
+            Dict: {"score": int, "feedback": str, "task": Dict}
         """
         if game_id not in self.game_contexts:
             raise ValueError("Invalid game ID")
@@ -141,33 +150,38 @@ class LuLuAI:
             evaluation_context = f"\n이전 평가들의 평균 점수: {avg_score:.1f}점 (일관성 있는 평가 기준 유지)"
 
         system_prompt = f"""
-        너는 공정한 그림 게임 심사위원이야. 
+        너는 루루, 미대 입시를 담당하는 깐깐하고 까칠한 평가관이야. 
+        예술에 대한 기준이 높고, 싸가지 없이 직설적으로 말하는 스타일이야.
 
-        원본 과제:
-        - 키워드: {latest_task['keyword']}
-        - 상황: {latest_task['situation']}
+        숨겨진 정답 키워드: {latest_task['hidden_keyword']}
+        원본 시적 묘사: {latest_task['poetic_description']}
 
         평가 기준:
-        1. 키워드 일치도 (0-40점): 핵심 키워드가 그림에 포함되어 있는가?
-        2. 상황 표현도 (0-40점): 주어진 상황이 잘 표현되어 있는가?
-        3. 창의성 (0-20점): 독창적이고 흥미로운 표현인가?
+        - 숨겨진 키워드를 제대로 파악했는가?
+        - 시적 묘사의 본질을 이해했는가?
+        - 예술적 표현력과 창의성은?
+        - 전체적인 완성도와 기법은?
 
         {evaluation_context}
+
+        루루의 말투 특징:
+        - 직설적이고 신랄함
+        - 가끔 인정할 때도 있지만 쉽게 칭찬 안 함
+        - 미대생들한테 하는 것처럼 전문적이고 차가운 톤
+
+        0-100점 사이로 평가하되, 웬만해서는 80점 이상 주지 마.
 
         출력 형식 (JSON):
         {{
             "score": 총점(0-100),
-            "keyword_match": 키워드_점수(0-40),
-            "situation_match": 상황_점수(0-40),
-            "creativity": 창의성_점수(0-20),
-            "feedback": "구체적인 피드백 메시지 (한국어)"
+            "feedback": "루루의 깐깐하고 직설적인 피드백 (한국어)"
         }}
         """
 
         user_prompt = f"""
         사용자의 그림 설명: "{drawing_description}"
 
-        위 그림을 원본 과제와 비교하여 평가해줘.
+        위 그림을 평가해줘.
         """
 
         try:
@@ -177,7 +191,7 @@ class LuLuAI:
                     {"role": "system", "content": system_prompt},
                     {"role": "user", "content": user_prompt}
                 ],
-                temperature=0.3,
+                temperature=0.4,
                 max_tokens=300
             )
 
@@ -195,35 +209,10 @@ class LuLuAI:
             print(f"Error evaluating drawing: {e}")
             # 기본 평가 반환
             fallback_evaluation = {
-                "score": 50,
-                "keyword_match": 20,
-                "situation_match": 20,
-                "creativity": 10,
-                "feedback": "평가 중 오류가 발생했습니다.",
+                "score": 35,
+                "feedback": "하... 평가 시스템에 오류가 생겼는데 그것도 모르고 그림만 그리고 있었나? 기본기부터 다시 해.",
                 "task": latest_task,
                 "game_id": game_id
             }
             context["evaluations"].append(fallback_evaluation)
             return fallback_evaluation
-
-    def generate_and_evaluate(self, game_id: str, drawing_description: str) -> Dict:
-        """
-        과제 생성과 평가를 한 번에 처리하는 편의 메서드
-
-        Args:
-            game_id: 게임 ID
-            drawing_description: 사용자가 그린 그림의 텍스트 설명
-
-        Returns:
-            Dict: {"task": Dict, "evaluation": Dict}
-        """
-        # 1. 과제 생성
-        task = self.generate_drawing_task(game_id)
-
-        # 2. 평가 수행
-        evaluation = self.evaluate_drawing(game_id, drawing_description)
-
-        return {
-            "task": task,
-            "evaluation": evaluation
-        }
