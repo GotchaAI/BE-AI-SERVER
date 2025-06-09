@@ -60,7 +60,7 @@ class LuLuAI:
             game_id: 게임 ID
 
         Returns:
-            Dict: {"hidden_keyword": str, "poetic_description": str, "game_id": str}
+            Dict: {"keyword": str, "situation": str, "game_id": str}
         """
         if game_id not in self.game_contexts:
             raise ValueError("Invalid game ID")
@@ -69,7 +69,7 @@ class LuLuAI:
 
         # 이전 과제들을 참고하여 중복 방지
         previous_tasks = context["tasks"]
-        previous_keywords = [task["hidden_keyword"] for task in previous_tasks]
+        previous_keywords = [task["keyword"] for task in previous_tasks]
 
         system_prompt = f"""
         너는 꿈과 환상을 다루는 신비로운 이야기꾼이야. 
@@ -85,7 +85,7 @@ class LuLuAI:
         {"이전에 사용한 키워드들: " + ", ".join(previous_keywords) + " (이 키워드들은 피해줘)" if previous_keywords else ""}
 
         출력은 반드시 JSON 형식으로:
-        {{"hidden_keyword": "숨겨진 키워드", "poetic_description": "시적이고 추상적인 묘사"}}
+        {{"keyword": "숨겨진 키워드", "situation": "시적이고 추상적인 묘사"}}
         """
 
         try:
@@ -101,6 +101,8 @@ class LuLuAI:
 
             # JSON 파싱
             content = response.choices[0].message.content.strip()
+            print(content)
+
             task_data = json.loads(content)
             task_data["game_id"] = game_id
 
@@ -113,8 +115,8 @@ class LuLuAI:
             print(f"Error generating task: {e}")
             # 기본값 반환
             fallback_task = {
-                "hidden_keyword": "달",
-                "poetic_description": "밤이 깊어질 때, 하늘의 은밀한 친구가 창문 너머로 속삭이고 있어. 그 둥근 미소가 어둠 속에서 혼자 빛나고 있는데, 왜인지 모르게 마음이 차분해져. 그 장면, 나한테 다시 보여줄 수 있을까?",
+                "keyword": "달",
+                "situation": "밤이 깊어질 때, 하늘의 은밀한 친구가 창문 너머로 속삭이고 있어. 그 둥근 미소가 어둠 속에서 혼자 빛나고 있는데, 왜인지 모르게 마음이 차분해져. 그 장면, 나한테 다시 보여줄 수 있을까?",
                 "game_id": game_id
             }
             context["tasks"].append(fallback_task)
@@ -153,8 +155,8 @@ class LuLuAI:
         너는 루루, 미대 입시를 담당하는 깐깐하고 까칠한 평가관이야. 
         예술에 대한 기준이 높고, 싸가지 없이 직설적으로 말하는 스타일이야.
 
-        숨겨진 정답 키워드: {latest_task['hidden_keyword']}
-        원본 시적 묘사: {latest_task['poetic_description']}
+        숨겨진 정답 키워드: {latest_task['keyword']}
+        원본 시적 묘사: {latest_task['situation']}
 
         평가 기준:
         - 숨겨진 키워드를 제대로 파악했는가?

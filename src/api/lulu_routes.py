@@ -60,7 +60,7 @@ def generate_task(game_id: str):
 
 
 class EvaluationReq(BaseModel):
-    imageDescription: str = Field(..., description="그린 그림에 대한 설명")
+    description: str = Field(..., description="그린 그림에 대한 설명")
 
 
 @router.post(
@@ -87,5 +87,5 @@ class EvaluationReq(BaseModel):
     }
 )
 def evaluate_task(game_id: str, req: EvaluationReq = Body()):
-    evaluation = lulu.evaluate_drawing(game_id, req.imageDescription)
+    evaluation = lulu.evaluate_drawing(game_id, req.description)
     return evaluation
