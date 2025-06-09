@@ -1,7 +1,7 @@
 import uvicorn
 from fastapi import FastAPI
 from src.api.image_routes import router as image_router
-from src.api.chat_routes import router as chat_router
+from src.api.myomyo_routes import router as chat_router
 from src.api.lulu_routes import router as lulu_router
 app = FastAPI(
     title="Gotcha! AI Server",

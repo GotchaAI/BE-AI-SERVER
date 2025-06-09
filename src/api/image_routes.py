@@ -58,10 +58,7 @@ responses={
         "description":"성공",
         "content" :{
             "application/json" : {
-                "example": {
-                    "filename" : "cat.png",
-                    "result":"a black and white drawing of cat"
-                }
+                "example": "a black and white drawing of cat"
             }
         }
     }
@@ -80,5 +77,4 @@ async def captioning(request: ImageReq = Body(...)):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Captioning error: {str(e)}")
 
-    filename = request.imageURL.split("/")[-1]
-    return CaptioningRes(filename=filename, result=caption)
+    return caption
