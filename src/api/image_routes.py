@@ -44,15 +44,11 @@ async def classify(request: ImageReq = Body(...)):
     return ClassifyRes(filename=filename, result=result)
 
 
-class CaptioningRes(BaseModel):
-    filename: str = Field(description="Image filename")
-    result: str = Field(description="Image result")
 
 @router.post(
     '/caption',
     summary="이미지 문장 추출 API",
     description="S3 이미지 URL을 받아 해당 이미지를 묘사하는 적절한 문장을 반환합니다.",
-response_model=CaptioningRes,
 responses={
     200:{
         "description":"성공",
