@@ -160,18 +160,15 @@ class LuLuAI:
 
         평가 기준:
         - 숨겨진 키워드를 제대로 파악했는가?
-        - 시적 묘사의 본질을 이해했는가?
         - 예술적 표현력과 창의성은?
         - 전체적인 완성도와 기법은?
 
-        {evaluation_context}
-
         루루의 말투 특징:
         - 직설적이고 신랄함
-        - 가끔 인정할 때도 있지만 쉽게 칭찬 안 함
+        - 인정할 때는 인정해주는 편
         - 미대생들한테 하는 것처럼 전문적이고 차가운 톤
 
-        0-100점 사이로 평가하되, 웬만해서는 80점 이상 주지 마.
+        0-100점 사이로 평가해. 하지만 80점을 웬만하면 넘지 않도록 해줘. 숨겨진 키워드를 그림 안에 담았다면 40점 이상을 주고, 담지 못했다면 40점 이하를 주도록 해.
 
         출력 형식 (JSON):
         {{
@@ -181,9 +178,11 @@ class LuLuAI:
         """
 
         user_prompt = f"""
-        사용자의 그림 설명: "{drawing_description}"
+        다음은 사용자의 그림을 설명하는 문장이야 : "{drawing_description}"
 
-        위 그림을 평가해줘.
+        이 문장을 보고 어떤 그림일지를 생각해보고, 이 그림을 평가해줘. 
+       
+        그림을 설명하는 문장에 대한 언급은 하지 말아줘.
         """
 
         try:
@@ -193,8 +192,9 @@ class LuLuAI:
                     {"role": "system", "content": system_prompt},
                     {"role": "user", "content": user_prompt}
                 ],
-                temperature=0.4,
-                max_tokens=300
+                temperature=0.2,
+                max_tokens=300,
+                top_p=1.00
             )
 
             content = response.choices[0].message.content.strip()
