@@ -31,6 +31,7 @@ class LuLuAI:
             self.model = model
             self._initialized = True
             self.game_contexts = {}  # gameId별 컨텍스트 저장
+            self.global_used_keywords = []  # 전역 사용된 키워드 저장 (최대 30개)
 
     def create_game(self) -> str:
         """
@@ -51,6 +52,21 @@ class LuLuAI:
             "created_at": None
         }
         return game_id
+
+    def _update_global_keywords(self, new_keyword: str):
+        """
+        전역 키워드 목록 업데이트 (최대 30개 유지)
+
+        Args:
+            new_keyword: 새로 추가할 키워드
+        """
+        if new_keyword not in self.global_used_keywords:
+            self.global_used_keywords.append(new_keyword)
+            # 30개를 초과하면 가장 오래된 것부터 제거
+            if len(self.global_used_keywords) > 30:
+                self.global_used_keywords.pop(0)
+
+
 
     def generate_drawing_task(self, game_id: str) -> Dict:
         """
@@ -77,12 +93,10 @@ class LuLuAI:
 
         규칙:
         - 핵심 키워드(명사)를 정하되, 절대 그 단어를 직접 언급하지 마
-        - 감정적이고 모호한 표현 사용
-        - 마치 꿈에서 본 장면을 애매하게 묘사하는 느낌
-        - "어둠이 숨을 죽이고 있을 때..." 같은 스타일
         - 해석의 여지가 많도록 추상적으로
+        
+         {"이전에 사용한 키워드들: " + ", ".join(previous_keywords) + " (이 키워드들은 피해줘)" if previous_keywords else ""}
 
-        {"이전에 사용한 키워드들: " + ", ".join(previous_keywords) + " (이 키워드들은 피해줘)" if previous_keywords else ""}
 
         출력은 반드시 JSON 형식으로:
         {{"keyword": "숨겨진 키워드", "situation": "시적이고 추상적인 묘사"}}
@@ -95,8 +109,9 @@ class LuLuAI:
                     {"role": "system", "content": system_prompt},
                     {"role": "user", "content": "새로운 그림 주제를 시적으로 표현해줘."}
                 ],
-                temperature=0.9,
-                max_tokens=250
+                temperature=1.0,
+                max_tokens=2048,
+                top_p=1.0
             )
 
             # JSON 파싱
@@ -168,7 +183,9 @@ class LuLuAI:
         - 인정할 때는 인정해주는 편
         - 미대생들한테 하는 것처럼 전문적이고 차가운 톤
 
-        0-100점 사이로 평가해. 하지만 80점을 웬만하면 넘지 않도록 해줘. 숨겨진 키워드를 그림 안에 담았다면 40점 이상을 주고, 담지 못했다면 40점 이하를 주도록 해.
+        0-100점 사이로 평가해. 하지만 80점을 웬만하면 넘지 않도록 해줘. 숨겨진 키워드를 그림 안에 담았다면 30점 이상을 주고, 담지 못했다면 30점 이하를 주도록 해.
+        
+        30점 이상이 합격이야.
 
         출력 형식 (JSON):
         {{
