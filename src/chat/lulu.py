@@ -30,7 +30,7 @@ class LuLuAI:
             self.client = OpenAI(api_key=api_key)
             self.model = model
             self._initialized = True
-            self.game_contexts = {}  # gameId별 컨텍스트 저장
+            self.active_games = {}  # gameId별 현재 task만 저장
             self.global_used_keywords = []  # 전역 사용된 키워드 저장 (최대 30개)
 
     def create_game(self) -> str:
@@ -43,14 +43,10 @@ class LuLuAI:
         # 중복되지 않는 4자리 숫자 생성
         while True:
             game_id = f"{random.randint(1000, 9999)}"
-            if game_id not in self.game_contexts:
+            if game_id not in self.active_games:
                 break
 
-        self.game_contexts[game_id] = {
-            "tasks": [],  # 생성된 과제들
-            "evaluations": [],  # 평가 결과들
-            "created_at": None
-        }
+        self.active_games[game_id] = None  # 아직 task 생성 안됨
         return game_id
 
     def _update_global_keywords(self, new_keyword: str):
@@ -66,6 +62,18 @@ class LuLuAI:
             if len(self.global_used_keywords) > 30:
                 self.global_used_keywords.pop(0)
 
+    def flush_game_data(self, game_id: str):
+        """
+        특정 게임 ID의 데이터를 삭제
+
+        Args:
+            game_id: 삭제할 게임 ID
+
+        Returns:
+            bool: 삭제 성공 여부
+        """
+        if game_id in self.active_games:
+            del self.active_games[game_id]
 
 
     def generate_drawing_task(self, game_id: str) -> Dict:
@@ -78,14 +86,9 @@ class LuLuAI:
         Returns:
             Dict: {"keyword": str, "situation": str, "game_id": str}
         """
-        if game_id not in self.game_contexts:
+        if game_id not in self.active_games:
             raise ValueError("Invalid game ID")
 
-        context = self.game_contexts[game_id]
-
-        # 이전 과제들을 참고하여 중복 방지
-        previous_tasks = context["tasks"]
-        previous_keywords = [task["keyword"] for task in previous_tasks]
 
         system_prompt = f"""
         너는 꿈과 환상을 다루는 신비로운 이야기꾼이야. 
@@ -95,8 +98,9 @@ class LuLuAI:
         - 핵심 키워드(명사)를 정하되, 절대 그 단어를 직접 언급하지 마
         - 해석의 여지가 많도록 추상적으로
         
-         {"이전에 사용한 키워드들: " + ", ".join(previous_keywords) + " (이 키워드들은 피해줘)" if previous_keywords else ""}
+        {f"이미 사용된 키워드들 (절대 사용하지 마): {', '.join(self.global_used_keywords)}" if self.global_used_keywords else ""}
 
+        다양한 주제를 다뤄줘 (자연, 감정, 사물, 추상 개념, 동물, 건물, 음식, 계절, 색깔, 직업 등).
 
         출력은 반드시 JSON 형식으로:
         {{"keyword": "숨겨진 키워드", "situation": "시적이고 추상적인 묘사"}}
@@ -121,9 +125,7 @@ class LuLuAI:
             task_data = json.loads(content)
             task_data["game_id"] = game_id
 
-            # 컨텍스트에 저장
-            context["tasks"].append(task_data)
-
+            self.active_games[game_id] = task_data
             return task_data
 
         except Exception as e:
@@ -134,7 +136,6 @@ class LuLuAI:
                 "situation": "밤이 깊어질 때, 하늘의 은밀한 친구가 창문 너머로 속삭이고 있어. 그 둥근 미소가 어둠 속에서 혼자 빛나고 있는데, 왜인지 모르게 마음이 차분해져. 그 장면, 나한테 다시 보여줄 수 있을까?",
                 "game_id": game_id
             }
-            context["tasks"].append(fallback_task)
             return fallback_task
 
     def evaluate_drawing(self, game_id: str, drawing_description: str) -> Dict:
@@ -148,30 +149,22 @@ class LuLuAI:
         Returns:
             Dict: {"score": int, "feedback": str, "task": Dict}
         """
-        if game_id not in self.game_contexts:
+        if game_id not in self.active_games:
             raise ValueError("Invalid game ID")
 
-        context = self.game_contexts[game_id]
+        current_task = self.active_games[game_id]
 
         # 가장 최근 과제 가져오기
-        if not context["tasks"]:
-            raise ValueError("No task found for this game")
+        if current_task is None:
+            raise ValueError("No task found for this game.")
 
-        latest_task = context["tasks"][-1]
-
-        # 이전 평가 결과들을 참고하여 일관성 있는 평가
-        previous_evaluations = context["evaluations"]
-        evaluation_context = ""
-        if previous_evaluations:
-            avg_score = sum(eval["score"] for eval in previous_evaluations) / len(previous_evaluations)
-            evaluation_context = f"\n이전 평가들의 평균 점수: {avg_score:.1f}점 (일관성 있는 평가 기준 유지)"
 
         system_prompt = f"""
         너는 루루, 미대 입시를 담당하는 깐깐하고 까칠한 평가관이야. 
         예술에 대한 기준이 높고, 싸가지 없이 직설적으로 말하는 스타일이야.
 
-        숨겨진 정답 키워드: {latest_task['keyword']}
-        원본 시적 묘사: {latest_task['situation']}
+        숨겨진 정답 키워드: {current_task['keyword']}
+        원본 시적 묘사: {current_task['situation']}
 
         평가 기준:
         - 숨겨진 키워드를 제대로 파악했는가?
@@ -216,11 +209,8 @@ class LuLuAI:
 
             content = response.choices[0].message.content.strip()
             evaluation = json.loads(content)
-            evaluation["task"] = latest_task
+            evaluation["task"] = current_task
             evaluation["game_id"] = game_id
-
-            # 컨텍스트에 저장
-            context["evaluations"].append(evaluation)
 
             return evaluation
 
@@ -230,8 +220,7 @@ class LuLuAI:
             fallback_evaluation = {
                 "score": 35,
                 "feedback": "하... 평가 시스템에 오류가 생겼는데 그것도 모르고 그림만 그리고 있었나? 기본기부터 다시 해.",
-                "task": latest_task,
+                "task": current_task,
                 "game_id": game_id
             }
-            context["evaluations"].append(fallback_evaluation)
             return fallback_evaluation
