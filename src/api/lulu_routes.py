@@ -88,4 +88,5 @@ class EvaluationReq(BaseModel):
 )
 def evaluate_task(game_id: str, req: EvaluationReq = Body()):
     evaluation = lulu.evaluate_drawing(game_id, req.description)
+    lulu.flush_game_data(game_id)
     return evaluation

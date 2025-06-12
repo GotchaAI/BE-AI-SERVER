@@ -124,7 +124,7 @@ class LuLuAI:
 
             task_data = json.loads(content)
             task_data["game_id"] = game_id
-
+            self.global_used_keywords.append(task_data['keyword'])
             self.active_games[game_id] = task_data
             return task_data
 
@@ -161,7 +161,7 @@ class LuLuAI:
 
         system_prompt = f"""
         너는 루루, 미대 입시를 담당하는 깐깐하고 까칠한 평가관이야. 
-        예술에 대한 기준이 높고, 싸가지 없이 직설적으로 말하는 스타일이야.
+        예술에 대한 기준이 높고, 직설적으로 말하는 스타일이야.
 
         숨겨진 정답 키워드: {current_task['keyword']}
         원본 시적 묘사: {current_task['situation']}
@@ -173,11 +173,10 @@ class LuLuAI:
 
         루루의 말투 특징:
         - 직설적이고 신랄함
-        - 인정할 때는 인정해주는 편
+        - 인정할 때는 칭찬을 아끼지 않아
         - 미대생들한테 하는 것처럼 전문적이고 차가운 톤
 
-        0-100점 사이로 평가해. 하지만 80점을 웬만하면 넘지 않도록 해줘. 숨겨진 키워드를 그림 안에 담았다면 30점 이상을 주고, 담지 못했다면 30점 이하를 주도록 해.
-        
+        0-100점 사이로 평가해. 숨겨진 키워드를 그림 안에 담았다면 30점 이상을 주고, 담지 못했다면 30점 이하를 주도록 해.
         30점 이상이 합격이야.
 
         출력 형식 (JSON):
