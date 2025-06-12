@@ -63,7 +63,7 @@ def load_efficientnet_model(model_path, num_classes):
         return model
 
 # 모델 로드
-model = load_efficientnet_model(latest_file, len(config.KOR_CATEGORIES))
+model = load_efficientnet_model(latest_file, len(config.DEMO_CATEGORIES))
 model.to(device)
 model.eval()  # 평가 모드
 logging.info("EfficientNet 모델 로드 완료!")
@@ -100,7 +100,7 @@ def classify(image):
             confidence = top3_prob[0][i].item() * 100
             
             results.append({
-                'predicted': config.KOR_CATEGORIES[class_idx],
+                'predicted': config.DEMO_CATEGORIES[class_idx],
                 'confidence': confidence
             })
         
