@@ -127,11 +127,7 @@ class LuLuAI:
             # task_data = json.loads(content)
             task_data = dict()
             task_data['keyword'] = '불꽃놀이'
-            task_data['situation'] = """어둠이 숨을 죽이고 있을 때,
-            하늘에 누군가의 기분이 터지는 걸 보았어.
-            반짝임이 너무 빨라서 눈이 따라가지 못했지만,
-            그 짧은 순간만큼은 모두가 같은 쪽을 보고 있었지.
-            그 장면, 나한테 다시 보여줄 수 있을까?"""
+            task_data['situation'] = """어둠이 숨을 죽이고 있을 때, 하늘에 누군가의 기분이 터지는 걸 보았어. 반짝임이 너무 빨라서 눈이 따라가지 못했지만, 그 짧은 순간만큼은 모두가 같은 쪽을 보고 있었지. 그 장면, 나한테 다시 보여줄 수 있을까?"""
 
             task_data["game_id"] = game_id
             self.global_used_keywords.append(task_data['keyword'])
