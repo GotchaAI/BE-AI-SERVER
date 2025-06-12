@@ -107,22 +107,32 @@ class LuLuAI:
         """
 
         try:
-            response = self.client.chat.completions.create(
-                model=self.model,
-                messages=[
-                    {"role": "system", "content": system_prompt},
-                    {"role": "user", "content": "새로운 그림 주제를 시적으로 표현해줘."}
-                ],
-                temperature=1.0,
-                max_tokens=2048,
-                top_p=1.0
-            )
+            # response = self.client.chat.completions.create(
+            #     model=self.model,
+            #     messages=[
+            #         {"role": "system", "content": system_prompt},
+            #         {"role": "user", "content": "새로운 그림 주제를 시적으로 표현해줘."}
+            #     ],
+            #     temperature=1.0,
+            #     max_tokens=2048,
+            #     top_p=1.0
+            # )
 
-            # JSON 파싱
-            content = response.choices[0].message.content.strip()
-            print(content)
+            # # JSON 파싱
+            # content = response.choices[0].message.content.strip()
+            # print(content)
 
-            task_data = json.loads(content)
+            #
+            #
+            # task_data = json.loads(content)
+            task_data = dict()
+            task_data['keyword'] = '불꽃놀이'
+            task_data['situation'] = """어둠이 숨을 죽이고 있을 때,
+            하늘에 누군가의 기분이 터지는 걸 보았어.
+            반짝임이 너무 빨라서 눈이 따라가지 못했지만,
+            그 짧은 순간만큼은 모두가 같은 쪽을 보고 있었지.
+            그 장면, 나한테 다시 보여줄 수 있을까?"""
+
             task_data["game_id"] = game_id
             self.global_used_keywords.append(task_data['keyword'])
             self.active_games[game_id] = task_data
