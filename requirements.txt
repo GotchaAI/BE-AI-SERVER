@@ -1,0 +1,11 @@
+matplotlib
+numpy==1.26.4
+opencv-python==4.7.0.72
+torch==2.7.0
+torchvision==0.22.0
+uvicorn
+python-multipart
+easyocr
+fastapi
+openai
+transformers
