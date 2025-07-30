@@ -1,0 +1,26 @@
+# 가상환경 폴더
+.venv/
+env/
+venv/
+
+# Python 캐시
+__pycache__/
+*.pyc
+*.pyo
+
+# 환경 파일
+.env
+
+# IDE / 에디터 설정
+.idea/
+.vscode/
+
+# Git
+.git/
+.gitignore
+
+# 로그
+*.log
+
+# macOS
+.DS_Store
