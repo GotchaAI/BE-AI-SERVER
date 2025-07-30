@@ -1,9 +1,9 @@
 from typing import Dict, Any, List
 
 from fastapi import APIRouter, File, UploadFile, Body, HTTPException
-from src.image import classifier, preprocessor, img_caption
+# from src.image import classifier, preprocessor, img_caption
 from pydantic import BaseModel, Field
-import requests
+# import requests
 from io import BytesIO
 router = APIRouter(prefix="/image", tags=['Image'])
 
@@ -26,20 +26,24 @@ class ImageReq(BaseModel):
     response_model=ClassifyRes,
 )
 async def classify(request: ImageReq = Body(...)):
-    try:
-        response = requests.get(request.imageURL)
-        response.raise_for_status()  # HTTPError 발생시 예외 처리
-    except Exception as e:
-        raise HTTPException(status_code=400, detail=f"Image processing error: {str(e)}")
+    # try:
+    #     response = requests.get(request.imageURL)
+    #     response.raise_for_status()  # HTTPError 발생시 예외 처리
+    # except Exception as e:
+    #     raise HTTPException(status_code=400, detail=f"Image processing error: {str(e)}")
+    #
+    # try:
+    #     bytes_img = response.content
+    #     img = preprocessor.preproc(bytes_img)
+    #     result = classifier.classify(img)
+    # except Exception as e:
+    #     raise HTTPException(status_code=500, detail=f"Classification error: {str(e)}")
 
-    try:
-        bytes_img = response.content
-        img = preprocessor.preproc(bytes_img)
-        result = classifier.classify(img)
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Classification error: {str(e)}")
-
-
+    result = [
+        {'predicted': '항공모함', 'confidence': 0.85},
+        {'predicted': '비행기', 'confidence': 0.10 },
+        {'predicted': '커피', 'confidence' : 0.05}
+    ]
     filename = request.imageURL.split("/")[-1]
     return ClassifyRes(filename=filename, result=result)
 
@@ -60,17 +64,17 @@ responses={
     }
 })
 async def captioning(request: ImageReq = Body(...)):
-    try:
-        response = requests.get(request.imageURL)
-        response.raise_for_status()  # HTTPError 발생시 예외 처리
-    except Exception as e:
-        raise HTTPException(status_code=400, detail=f"Image processing error: {str(e)}")
+    # try:
+    #     response = requests.get(request.imageURL)
+    #     response.raise_for_status()  # HTTPError 발생시 예외 처리
+    # except Exception as e:
+    #     raise HTTPException(status_code=400, detail=f"Image processing error: {str(e)}")
+    #
+    # try:
+    #     bytes_img = response.content
+    #     img = preprocessor.preproc(bytes_img)
+    #     caption = img_caption.get_caption(img)
+    # except Exception as e:
+    #     raise HTTPException(status_code=500, detail=f"Captioning error: {str(e)}")
 
-    try:
-        bytes_img = response.content
-        img = preprocessor.preproc(bytes_img)
-        caption = img_caption.get_caption(img)
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Captioning error: {str(e)}")
-
-    return caption
+    return "a black and white drawing of cat"

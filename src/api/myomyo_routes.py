@@ -36,8 +36,9 @@ class GameStartReq(BaseModel):
     }
 )
 async def start_game(game_id: str, request: GameStartReq = Body(..., example= { "players": [ "창모", "릴러말즈" ]})):
-    message = await myomyo.game_start_message(game_id=game_id, players=request.players)
-    return message
+    # message = await myomyo.game_start_message(game_id=game_id, players=request.players)
+    # return message
+    return "서버 점검중이다묘!"
 
 # START_ROUND
 class RoundStartReq(BaseModel):
@@ -67,13 +68,13 @@ async def start_round(game_id: str, request: RoundStartReq = Body(..., example={
     "roundNum" : 1,
     "totalRounds" : 3
 })):
-    message = await myomyo.round_start_message(
-        game_id=game_id,
-        round_num=request.roundNum,
-        total_rounds=request.totalRounds
-    )
-    return message
-
+    # message = await myomyo.round_start_message(
+    #     game_id=game_id,
+    #     round_num=request.roundNum,
+    #     total_rounds=request.totalRounds
+    # )
+    # return message
+    return "서버 점검 중이다묘!"
 
 
 class RoundEndReq(BaseModel):
@@ -87,14 +88,14 @@ class RoundEndReq(BaseModel):
     description="라운드 종료 및 결과에 따른 묘묘의 반응 메시지를 반환합니다."
 )
 async def round_end(game_id: str, request: RoundEndReq = Body):
-    message = await myomyo.round_end_message(
-        game_id = game_id,
-        round_num = request.roundNum,
-        total_rounds = request.totalRounds,
-        is_myomyo_win= (request.winner == "AI")
-    )
-    return message
-
+    # message = await myomyo.round_end_message(
+    #     game_id = game_id,
+    #     round_num = request.roundNum,
+    #     total_rounds = request.totalRounds,
+    #     is_myomyo_win= (request.winner == "AI")
+    # )
+    # return message
+    return "서버 점검 중이다묘!"
 
 
 
@@ -113,9 +114,9 @@ class GuessStartReq(BaseModel):
     summary = "추측 시작 시 묘묘의 도발 메시지"
 )
 async def guess_start(game_id: str, request: GuessStartReq = Body(...,)):
-    message = await myomyo.guess_start_message(game_id=game_id, round_num=request.roundNum, total_rounds=request.totalRounds, drawer=request.drawer, guesser = request.guesser)
-    return message
-
+    # message = await myomyo.guess_start_message(game_id=game_id, round_num=request.roundNum, total_rounds=request.totalRounds, drawer=request.drawer, guesser = request.guesser)
+    # return message
+    return "서버 점검중이다묘!"
 # MAKE_GUESS
 class MakeGuessReq(BaseModel):
     imageDescription: str = Field(..., description="그림에 대한 설명")
@@ -143,12 +144,12 @@ class MakeGuessReq(BaseModel):
 async def make_guess(game_id: str, request: MakeGuessReq = Body(..., example={
     "image_description": "노란 꽃에 바람을 불고 있는 한 남자"
 })):
-    message = await myomyo.guess_message(
-        game_id=game_id,
-        image_description=request.imageDescription
-    )
-    return message
-
+    # message = await myomyo.guess_message(
+    #     game_id=game_id,
+    #     image_description=request.imageDescription
+    # )
+    # return message
+    return "서버 점검중이다묘!"
 
 # GUESS_REACT
 class GuessReactReq(BaseModel):
@@ -180,15 +181,14 @@ async def guess_react(game_id: str, request: GuessReactReq = Body(..., example={
     "answer" : "민들레",
     "guesser" : "릴러말즈"
 })):
-    message = await myomyo.react_to_guess_message(
-        game_id=game_id,
-        is_correct=request.is_correct,
-        guesser=request.guesser,
-        answer=request.answer
-    )
-
-    return message
-
+    # message = await myomyo.react_to_guess_message(
+    #     game_id=game_id,
+    #     is_correct=request.is_correct,
+    #     guesser=request.guesser,
+    #     answer=request.answer
+    # )
+    # return message
+    return "서버 점검줌이다묘!"
 
 
 class EndGameReq(BaseModel):
@@ -213,9 +213,10 @@ class EndGameReq(BaseModel):
         }
     })
 async def end_game(game_id: str, request: EndGameReq = Body(...,)):
-    message = await myomyo.game_end_message(
-        game_id=game_id,
-        is_myomyo_win=request.winner == "AI"
-    )
-    myomyo.cleanup_game(game_id=game_id)
-    return message
+    # message = await myomyo.game_end_message(
+    #     game_id=game_id,
+    #     is_myomyo_win=request.winner == "AI"
+    # )
+    # myomyo.cleanup_game(game_id=game_id)
+    # return message
+    return "서버 점검중이다묘!"
