@@ -67,15 +67,18 @@ jobs:
     needs: deploy
     runs-on: ubuntu-latest
 
+
+
     steps:
-      - name: Notify Deployment
+      - name: Slack notification on success
+        if: success()
         uses: slackapi/slack-github-action@v2
         with:
           method: chat.postMessage
-          channel-id: ${{ secrets.SLACK_CHANNEL_ID }}
           payload: |
             {
-              "text": "🚀 *배포 완료* on `${{ github.ref_name }}`",
+              "channel": "${{ secrets.SLACK_CHANNEL_ID }}",
+              "text": "✅ *배포 성공:* ${{ github.repository }} 저장소의 `${{ github.ref_name }}` 브랜치가 성공적으로 배포되었습니다.",
               "blocks": [
                 {
                   "type": "section",
@@ -88,3 +91,26 @@ jobs:
             }
         env:
           SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+
+      - name: Slack notification on failure
+        if: failure()
+        uses: slackapi/slack-github-action@v2
+        with:
+          method: chat.postMessage
+          payload: |
+            {
+              "channel": "${{ secrets.SLACK_CHANNEL_ID }}",
+              "text": "❌ *배포 실패:* ${{ github.repository }} 저장소의 `${{ github.ref_name }}` 브랜치 배포가 실패했습니다.",
+              "blocks": [
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "*Status:* `${{ job.status }}`\n*Commit:* <${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}|${{ github.sha }}>\n*Actor:* ${{ github.actor }}"
+                  }
+                }
+              ]
+            }
+        env:
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+
