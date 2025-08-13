@@ -80,7 +80,7 @@ jobs:
                   "type": "section",
                   "text": {
                     "type": "mrkdwn",
-                    "text": "*Status:* `${{ job.status }}`\n*Commit:* <${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}|${{ github.sha.substring(0,7) }}>\n*Actor:* ${{ github.actor }}"
+                    "text": "*Status:* `${{ job.status }}`\n*Commit:* <${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}|${{ github.sha }}>\n*Actor:* ${{ github.actor }}"
                   }
                 }
               ]
