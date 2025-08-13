@@ -71,6 +71,7 @@ jobs:
       - name: Notify Deployment
         uses: slackapi/slack-github-action@v2
         with:
+          method: chat.postMessage
           channel-id: ${{ secrets.SLACK_CHANNEL_ID }}
           payload: |
             {
