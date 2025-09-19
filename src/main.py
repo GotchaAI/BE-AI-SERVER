@@ -21,6 +21,8 @@ app = FastAPI(
     redoc_url="/redoc"
 )
 
-app.include_router()
-
+app.include_router(caption_router, prefix='/api/v1')
+app.include_router(classification_router, prefix='/api/v1')
+app.include_router(masking_router, prefix='/api/v1')
+app.include_router(myomyo_router, prefix='/api/v1')
 app.include_router(lulu_router, prefix='/api/v1')

@@ -1,5 +1,4 @@
 from fastapi import APIRouter, HTTPException, Request
-import httpx
 from pydantic import BaseModel, Field
 
 from src.core.caption import generate_caption
