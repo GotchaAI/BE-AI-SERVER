@@ -11,7 +11,6 @@ class Settings(BaseModel):
     S3_BUCKET_NAME: str = os.getenv("S3_BUCKET_NAME")
     NUM_CLASSES: int = 100 # Number of categories in the quick-draw dataset
 
-
     ENG_CATEGORIES: List[str] = [
         "aircraft carrier", "airplane", "alarm clock", "ambulance", "angel", "apple", "arm", "axe", "backpack",
         "banana",

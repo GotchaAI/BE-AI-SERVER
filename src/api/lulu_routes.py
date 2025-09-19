@@ -1,9 +1,7 @@
-from typing import List
-
 from fastapi import APIRouter, Body
 from pydantic import BaseModel, Field
 
-from src.chat.lulu import LuLuAI
+from src.chat import LuLuAI
 import os
 router = APIRouter(prefix = '/lulu', tags = ['LuLu'])
 

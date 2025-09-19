@@ -1,7 +1,10 @@
 from fastapi import FastAPI
-from src.api.image_routes import router as image_router
-from src.api.myomyo_routes import router as chat_router
-from src.api.lulu_routes import router as lulu_router
+from src.api.captioning import router as caption_router
+from src.api.myomyo import router as myomyo_router
+from src.api.lulu import router as lulu_router
+from src.api.classifying import router as classification_router
+from src.api.masking import router as masking_router
+import httpx
 
 async def lifespan(app):
     app.state.http = httpx.AsyncClient(
@@ -18,9 +21,6 @@ app = FastAPI(
     redoc_url="/redoc"
 )
 
-app.include_router(image_router, prefix='/api/v1')
-
-app.include_router(chat_router, prefix='/api/v1')
-
+app.include_router()
 
 app.include_router(lulu_router, prefix='/api/v1')
