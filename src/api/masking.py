@@ -10,7 +10,7 @@ router = APIRouter(
 )
 
 @router.post(
-    "/mask",
+    "/upload",
     summary="이미지 텍스트 마스킹 및 S3 업로드 API",
     description="업로드된 이미지 파일에서 텍스트를 마스킹하고, 마스킹된 이미지를 S3에 업로드한 후 해당 이미지의 URL을 반환합니다.",
     responses={
@@ -18,7 +18,6 @@ router = APIRouter(
 
     }
 )
-@router.post("/mask", summary="Mask text in image and upload to S3")
 async def mask_image(file: UploadFile = File(...)):
     if not S3_BUCKET_NAME:
         raise HTTPException(status_code=500, detail="S3_BUCKET_NAME 환경 변수가 설정되지 않았습니다.")
