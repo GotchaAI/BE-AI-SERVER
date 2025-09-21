@@ -1,6 +1,6 @@
 from typing import Dict, List
 from threading import Lock
-from openai import OpenAI
+from openai import AsyncOpenAI
 
 class MyoMyoAI:
     """
@@ -28,7 +28,7 @@ class MyoMyoAI:
         with self._lock:
             if self._initialized:
                 return
-            self.client = OpenAI(api_key=api_key)
+            self.client = AsyncOpenAI(api_key=api_key)
             self.model = model
             self._initialized = True
             self.game_histories = {} # game_id로 구분됨

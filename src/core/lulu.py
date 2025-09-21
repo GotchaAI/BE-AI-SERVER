@@ -1,4 +1,4 @@
-from openai import OpenAI
+from openai import AsyncOpenAI
 from threading import Lock
 from typing import Dict, List
 import json
@@ -27,7 +27,7 @@ class LuLuAI:
         with self._lock:
             if self._initialized:
                 return
-            self.client = OpenAI(api_key=api_key)
+            self.client = AsyncOpenAI(api_key=api_key)
             self.model = model
             self._initialized = True
             self.active_games = {}  # gameId별 현재 task만 저장
@@ -76,7 +76,7 @@ class LuLuAI:
             del self.active_games[game_id]
 
 
-    def generate_drawing_task(self, game_id: str) -> Dict:
+    async def generate_drawing_task(self, game_id: str) -> Dict:
         """
         요청 단계: AI가 추상적이고 시적인 표현으로 그림 과제 제시
 
@@ -105,7 +105,7 @@ class LuLuAI:
         {{"keyword": "숨겨진 키워드", "situation": "시적이고 추상적인 묘사"}}
         """
         try:
-            response = self.client.chat.completions.create(
+            response = await self.client.chat.completions.create(
                 model=self.model,
                 messages=[
                     {"role": "system", "content": system_prompt},
@@ -131,7 +131,7 @@ class LuLuAI:
 
 
 
-    def evaluate_drawing(self, game_id: str, drawing_description: str) -> Dict:
+    async def evaluate_drawing(self, game_id: str, drawing_description: str) -> Dict:
         """
         평가 단계: AI가 사용자의 그림을 숨겨진 키워드와 비교하여 평가
 
@@ -187,7 +187,7 @@ class LuLuAI:
         """
 
         try:
-            response = self.client.chat.completions.create(
+            response = await self.client.chat.completions.create(
                 model=self.model,
                 messages=[
                     {"role": "system", "content": system_prompt},

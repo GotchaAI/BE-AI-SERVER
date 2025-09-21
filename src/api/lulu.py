@@ -31,8 +31,8 @@ class LuLuTaskGenerateRes(BaseModel):
     "/task/{game_id}",
     summary = "루루가 키워드와 상황을 그림 과제를 제시합니다.",
 )
-def generate_task(game_id: str):
-    task = lulu.generate_drawing_task(game_id)
+async def generate_task(game_id: str):
+    task = await lulu.generate_drawing_task(game_id)
     return LuLuTaskGenerateRes(keyword=task["keyword"], situation=task["situation"])
 
 
@@ -63,7 +63,7 @@ class EvaluationReq(BaseModel):
         }
     }
 )
-def evaluate_task(game_id: str, req: EvaluationReq = Body()):
-    evaluation = lulu.evaluate_drawing(game_id, req.description)
+async def evaluate_task(game_id: str, req: EvaluationReq = Body()):
+    evaluation = await lulu.evaluate_drawing(game_id, req.description)
     lulu.flush_game_data(game_id)
     return evaluation
