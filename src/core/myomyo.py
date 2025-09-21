@@ -198,7 +198,7 @@ class MyoMyoAI:
              묘묘의 반응
          """
 
-        if guesser == '묘묘' or guesser is None:
+        if guesser == 'AI' or guesser is None:
             # 묘묘의 추측
             prompt = f"""너(묘묘)가 방금 추측을 했어. {f"정답은 '{answer}'야" if is_correct else ""}. 너의 추측은 {'맞았어' if is_correct else '틀렸어'}.
              이 결과에 대한 너의 반응을 짧고 도발적으로 말해줘."""

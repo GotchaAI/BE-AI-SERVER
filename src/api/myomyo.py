@@ -23,7 +23,7 @@ class GameStartReq(BaseModel):
 @router.post("/{game_id}/start", summary="게임 시작 메시지 API")
 async def start_game(game_id: str, request: GameStartReq = Body(...)):
     message = await myomyo.game_start_message(game_id=game_id, players=request.players)
-    return message
+    return GPTResponse(message=message)
 
 class RoundStartReq(BaseModel):
     round_num: int = Field(..., description="현재 라운드 번호")
