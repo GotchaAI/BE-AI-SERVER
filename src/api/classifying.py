@@ -27,7 +27,7 @@ class ClassifyRes(BaseModel):
 )
 async def classify_image(request: Request, body: ImageReq):
     try:
-        response = await request.app.state.http_client.get(body.image_url)
+        response = await request.app.state.http.get(body.image_url)
         response.raise_for_status()
         if not response.headers.get("content-type", "").startswith("image/"):
             raise HTTPException(415, "Unsupported content-type")

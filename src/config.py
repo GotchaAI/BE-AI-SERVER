@@ -4,11 +4,11 @@ import os
 
 class Settings(BaseModel):
     CAPTIONING_MODEL: str = "Salesforce/blip-image-captioning-base" # CAPTIONING MODEL : BLIP
-    CLASSIFYING_MODEL_PATH: str = "ml_models/classifying_model.pth" # CLASSIFYING MODEL : EFFICIENTNET_B0, fine-tuned with quick-draw dataset
-    AWS_ACCESS_KEY_ID: str = os.getenv("AWS_ACCESS_KEY_ID")
-    AWS_SECRET_ACCESS_KEY: str = os.getenv("AWS_SECRET_ACCESS_KEY")
-    AWS_REGION: str = os.getenv("AWS_REGION")
-    S3_BUCKET_NAME: str = os.getenv("S3_BUCKET_NAME")
+    CLASSIFYING_MODEL_PATH: str = "models/classifying_model.pth" # CLASSIFYING MODEL : EFFICIENTNET_B0, fine-tuned with quick-draw dataset
+    AWS_ACCESS_KEY_ID: str = os.getenv("AWS_S3_ACCESS_KEY_ID")
+    AWS_SECRET_ACCESS_KEY: str = os.getenv("AWS_S3_SECRET_ACCESS_KEY")
+    AWS_REGION: str = os.getenv("AWS_S3_REGION")
+    S3_BUCKET_NAME: str = os.getenv("AWS_S3_BUCKET_NAME")
     NUM_CLASSES: int = 100 # Number of categories in the quick-draw dataset
 
     ENG_CATEGORIES: List[str] = [
@@ -38,6 +38,6 @@ class Settings(BaseModel):
         "가재", "막대사탕", "우체통", "지도", "보드마카", "확성기", "달", "오토바이", "산", "머그컵"
     ]
 
-    TEXT_THRESHOLD=0.7
+    TEXT_THRESHOLD: float = 0.5
 
 settings = Settings()

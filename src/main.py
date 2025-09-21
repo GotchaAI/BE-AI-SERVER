@@ -13,12 +13,15 @@ async def lifespan(app):
     )
     yield
     await app.state.http.aclose()
+
+
 app = FastAPI(
     title="Gotcha! AI Server",
     description="AI Server",
     docs_url="/docs",
     openapi_url="/openapi.json",
-    redoc_url="/redoc"
+    redoc_url="/redoc",
+    lifespan=lifespan,
 )
 
 app.include_router(caption_router, prefix='/api/v1')

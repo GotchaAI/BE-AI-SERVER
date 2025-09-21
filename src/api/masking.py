@@ -1,4 +1,3 @@
-from http.client import HTTPResponse
 from io import BytesIO
 
 from fastapi import APIRouter, UploadFile, File, HTTPException

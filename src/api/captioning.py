@@ -21,7 +21,7 @@ class CaptionRes(BaseModel):
 )
 async def caption_image(request: Request, body: ImageReq):
     try:
-        response = await request.app.state.http_client.get(body.image_url)
+        response = await request.app.state.http.get(body.image_url)
         response.raise_for_status()
         if not response.headers.get("content-type", "").startswith("image/"):
             raise HTTPException(415, "지원하지 않는 콘텐츠 유형입니다. 이미지 파일만 허용됩니다.")

@@ -2,7 +2,6 @@ from PIL import Image, ImageDraw
 import easyocr
 import numpy as np
 import boto3
-import os
 from src.config import settings
 
 s3_client = boto3.client(
@@ -27,8 +26,8 @@ def recog_text(image: Image):
 
     filtered_boxes = [box for box, text, conf in results if conf >= settings.TEXT_THRESHOLD]
 
-    for i, box in enumerate(filtered_boxes):
-        print(f"[{i + 1}] 박스 좌표 (신뢰도 ≥ {settings.TEXT_THRESHOLD}): {box}")
+    # for i, box in enumerate(filtered_boxes):
+    #     print(f"[{i + 1}] 박스 좌표 (신뢰도 ≥ {settings.TEXT_THRESHOLD}): {box}")
 
     return filtered_boxes
 
