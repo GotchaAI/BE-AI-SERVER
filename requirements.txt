@@ -1,4 +1,16 @@
+fastapi
 uvicorn
 python-multipart
-fastapi
+transformers
+httpx
+Pillow
+--extra-index-url https://download.pytorch.org/whl/cpu
+torch
+torchvision
+pydantic
 openai
+requests
+easyocr
+numpy
+opencv-python-headless
+boto3

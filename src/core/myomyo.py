@@ -1,6 +1,6 @@
 from typing import Dict, List
 from threading import Lock
-from openai import OpenAI
+from openai import AsyncOpenAI
 
 class MyoMyoAI:
     """
@@ -28,7 +28,7 @@ class MyoMyoAI:
         with self._lock:
             if self._initialized:
                 return
-            self.client = OpenAI(api_key=api_key)
+            self.client = AsyncOpenAI(api_key=api_key)
             self.model = model
             self._initialized = True
             self.game_histories = {} # game_id로 구분됨
@@ -109,7 +109,7 @@ class MyoMyoAI:
             })
 
         try:
-            responses = self.client.chat.completions.create(
+            responses = await self.client.chat.completions.create(
                 model = self.model,
                 messages = messages,
                 temperature = 0.8, # 모델 출력의 무작위성 제어
@@ -198,7 +198,7 @@ class MyoMyoAI:
              묘묘의 반응
          """
 
-        if guesser == '묘묘' or guesser is None:
+        if guesser == 'AI' or guesser is None:
             # 묘묘의 추측
             prompt = f"""너(묘묘)가 방금 추측을 했어. {f"정답은 '{answer}'야" if is_correct else ""}. 너의 추측은 {'맞았어' if is_correct else '틀렸어'}.
              이 결과에 대한 너의 반응을 짧고 도발적으로 말해줘."""
