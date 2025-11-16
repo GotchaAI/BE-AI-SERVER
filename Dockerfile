@@ -15,7 +15,8 @@ WORKDIR /app
 RUN apt-get update && apt-get install -y libgl1 libglib2.0-0
 COPY --from=builder /usr/local /usr/local
 
+COPY models/ models/
 COPY src/ src/
-COPY run.py config.py .
+COPY run.py .
 
 CMD ["python", "run.py"]
