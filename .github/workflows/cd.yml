@@ -47,8 +47,7 @@ jobs:
           username: ${{ secrets.SERVER_USERNAME }}
           key: ${{ secrets.SERVER_PRIVATE_KEY }}
           script: |
-            cd ~/ai-server
-          
+                    
             docker stop ai-server || true
             docker rm ai-server || true
             
@@ -62,52 +61,3 @@ jobs:
               --env-file .env \
               -p 8000:8000 \
               ${{ secrets.DOCKER_USERNAME }}/gotcha-ai:latest
-
-  notify:
-    needs: deploy
-    runs-on: ubuntu-latest
-
-
-
-    steps:
-      - name: Slack notification on success
-        if: success()
-        uses: slackapi/slack-github-action@v2
-        with:
-          method: chat.postMessage
-          token: ${{ secrets.SLACK_BOT_TOKEN }}
-          payload: |
-            {
-              "channel": "${{ secrets.SLACK_CHANNEL_ID }}",
-              "text": "✅ *배포 성공:* ${{ github.repository }} 저장소의 `${{ github.ref_name }}` 브랜치가 성공적으로 배포되었습니다.",
-              "blocks": [
-                {
-                  "type": "section",
-                  "text": {
-                    "type": "mrkdwn",
-                    "text": "*Status:* `${{ job.status }}`\n*Commit:* <${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}|${{ github.sha }}>\n*Actor:* ${{ github.actor }}"
-                  }
-                }
-              ]
-            }
-
-      - name: Slack notification on failure
-        if: failure()
-        uses: slackapi/slack-github-action@v2
-        with:
-          method: chat.postMessage
-          token: ${{ secrets.SLACK_BOT_TOKEN }}
-          payload: |
-            {
-              "channel": "${{ secrets.SLACK_CHANNEL_ID }}",
-              "text": "❌ *배포 실패:* ${{ github.repository }} 저장소의 `${{ github.ref_name }}` 브랜치 배포가 실패했습니다.",
-              "blocks": [
-                {
-                  "type": "section",
-                  "text": {
-                    "type": "mrkdwn",
-                    "text": "*Status:* `${{ job.status }}`\n*Commit:* <${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}|${{ github.sha }}>\n*Actor:* ${{ github.actor }}"
-                  }
-                }
-              ]
-            }
