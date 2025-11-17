@@ -45,9 +45,18 @@ def mask_text(image: Image):
     return masked
 
 def upload_to_s3(buffer, filename):
-    s3_client.upload_fileobj(buffer, S3_BUCKET_NAME, filename)
+    import mimetypes
+    content_type, _ = mimetypes.guess_type(filename)
+    if content_type is None:
+        content_type = 'application/octet-stream'
+    buffer.seek(0)
+    s3_client.upload_fileobj(
+        buffer,
+        S3_BUCKET_NAME,
+        filename,
+        ExtraArgs={'ContentType': content_type }
+    )
     return f"https://{S3_BUCKET_NAME}.s3.amazonaws.com/{filename}"
-
 
 
 
