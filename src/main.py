@@ -5,6 +5,7 @@ from src.api.lulu import router as lulu_router
 from src.api.classifying import router as classification_router
 from src.api.masking import router as masking_router
 import httpx
+from fastapi.middleware.cors import CORSMiddleware
 
 async def lifespan(app):
     app.state.http = httpx.AsyncClient(
@@ -22,6 +23,14 @@ app = FastAPI(
     openapi_url="/openapi.json",
     redoc_url="/redoc",
     lifespan=lifespan,
+)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 app.include_router(caption_router, prefix='/api/v1')
