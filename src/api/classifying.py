@@ -29,8 +29,15 @@ async def classify_image(request: Request, body: ImageReq):
     try:
         response = await request.app.state.http.get(body.image_url)
         response.raise_for_status()
+
         if not response.headers.get("content-type", "").startswith("image/"):
-            raise HTTPException(415, "Unsupported content-type")
+            # fallback: 실제 바이트로 이미지 여부 검사
+            try:
+                from io import BytesIO
+                from PIL import Image
+                Image.open(BytesIO(response.content)).verify()
+            except Exception:
+                raise HTTPException(status_code=415, detail="Unsupported content-type")
         predictions = classify(response.content)
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error processing image: {e}")
